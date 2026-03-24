@@ -56,34 +56,34 @@ const ScoreBreakdown = () => {
   const topFactor = factors[0];
 
   return (
-    <section className="rounded-xl bg-surface-container-high p-5 md:p-6 ghost-border">
+    <section className="rounded-xl bg-surface-container-high p-6 md:p-7 ghost-border">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Breakdown</p>
-          <h3 className="text-2xl font-bold tracking-tight mt-1">Factor Contribution Matrix</h3>
+          <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Breakdown</p>
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">Factor Contribution Matrix</h3>
         </div>
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">Weighted / Dynamic</span>
+        <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-tertiary">Weighted / Dynamic</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Top Factor</p>
-          <p className="text-sm font-semibold mt-2">{topFactor.name}</p>
-          <p className="text-xs text-tertiary mt-1">{topFactor.percentage}% weight</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Top Factor</p>
+          <p className="text-base font-semibold mt-2">{topFactor.name}</p>
+          <p className="text-sm text-tertiary mt-1">{topFactor.percentage}% weight</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Model Confidence</p>
-          <p className="text-sm font-semibold mt-2">High</p>
-          <p className="text-xs text-secondary mt-1">Stable over 90 days</p>
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Model Confidence</p>
+          <p className="text-base font-semibold mt-2">High</p>
+          <p className="text-sm text-secondary mt-1">Stable over 90 days</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Volatility</p>
-          <p className="text-sm font-semibold mt-2">Low</p>
-          <p className="text-xs text-primary mt-1">Predictive drift: 1.9%</p>
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Volatility</p>
+          <p className="text-base font-semibold mt-2">Low</p>
+          <p className="text-sm text-primary mt-1">Predictive drift: 1.9%</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {factors.map((factor, index) => {
           const mockData = generateMockData();
           const chartData = {
@@ -99,20 +99,20 @@ const ScoreBreakdown = () => {
           };
 
           return (
-            <article key={index} className="rounded-lg bg-surface-container-low p-4">
+            <article key={index} className="rounded-lg bg-surface-container-low p-5">
               <div className="flex justify-between items-start gap-2 mb-3">
                 <div>
-                  <span className="text-sm font-medium">{factor.name}</span>
-                  <p className="text-[11px] text-on-surface-variant mt-1">{factor.impact}</p>
+                  <span className="text-base font-medium leading-tight">{factor.name}</span>
+                  <p className="text-sm text-on-surface-variant mt-1">{factor.impact}</p>
                 </div>
-                <span className="rounded-lg px-2 py-0.5 text-[11px] font-semibold bg-secondary-container/20 text-secondary">{factor.percentage}%</span>
+                <span className="rounded-lg px-2.5 py-1 text-xs font-semibold bg-secondary-container/20 text-secondary">{factor.percentage}%</span>
               </div>
 
-              <div className="h-1.5 bg-surface-container-highest rounded-full overflow-hidden mb-3">
-                <div className="h-full rounded-full" style={{ width: `${factor.percentage * 2.4}%`, backgroundColor: factor.color }}></div>
+              <div className="h-2 bg-surface-container-highest rounded-full overflow-hidden mb-3">
+                <div className="h-full rounded-full" style={{ width: `${factor.percentage}%`, backgroundColor: factor.color }}></div>
               </div>
 
-              <div style={{ height: '56px' }}>
+              <div style={{ height: '72px' }}>
                 <Line data={chartData} options={chartOptions} />
               </div>
             </article>

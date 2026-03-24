@@ -14,7 +14,7 @@ const CreditScoreSpeedometer = ({ score }) => {
 
   return (
     <section className="relative flex flex-col items-center justify-center py-4">
-      <div className="relative w-72 h-72 flex items-center justify-center">
+      <div className="relative w-[18rem] h-[18rem] sm:w-[20rem] sm:h-[20rem] md:w-[22rem] md:h-[22rem] flex items-center justify-center">
         <div className="absolute inset-0 rounded-full border-[12px] border-surface-container-highest opacity-30"></div>
 
         <div
@@ -22,13 +22,13 @@ const CreditScoreSpeedometer = ({ score }) => {
           style={{ transform: `rotate(${rotation}deg)` }}
         ></div>
 
-        <div className="glass-card ghost-border rounded-full w-56 h-56 flex items-center justify-center flex-col ai-pulse">
+        <div className="glass-card ghost-border rounded-full w-52 h-52 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center flex-col ai-pulse">
           <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-on-surface-variant">Credit Score</span>
-          <div className="text-6xl leading-none font-extrabold tracking-tighter ai-shimmer mt-2">{score}</div>
+          <div className="text-5xl sm:text-6xl md:text-7xl leading-none font-extrabold tracking-tighter ai-shimmer mt-2">{score}</div>
           <span className="mt-2 rounded-full px-3 py-0.5 text-[10px] uppercase tracking-[0.2em] bg-secondary/20 text-secondary font-semibold">{getBand(score)}</span>
         </div>
 
-        <div className="absolute -z-10 w-64 h-64 rounded-full bg-tertiary/20 blur-[80px]"></div>
+        <div className="absolute -z-10 w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-tertiary/20 blur-[80px]"></div>
       </div>
     </section>
   );

@@ -47,8 +47,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface app-safe-bottom">
-      <header className="fixed top-0 left-0 w-full z-50 px-6 py-4 bg-background/80 backdrop-blur-glass shadow-ambient">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 lg:px-8 py-4 bg-background/80 backdrop-blur-glass shadow-ambient">
+        <div className="mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-tertiary">security</span>
             <h1 className="text-xl font-bold tracking-tighter text-tertiary">EtherScore</h1>
@@ -77,8 +77,8 @@ function App() {
         </div>
       </header>
 
-      <main className="pt-24 px-6 max-w-lg mx-auto space-y-8">
-        <div className="mx-auto max-w-lg space-y-8">
+      <main className="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+        <div className="mx-auto w-full max-w-7xl space-y-8">
           <section className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-container/20 text-tertiary border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
               <span className="material-symbols-outlined text-sm">verified</span>
@@ -90,7 +90,7 @@ function App() {
             <section className="flex justify-center">
               <button
                 onClick={getCreditScore}
-                className="w-full rounded-full py-3 px-6 bg-primary hover:bg-primary-container transition-colors text-background font-semibold tracking-wide"
+                className="w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-primary-container transition-colors text-background font-semibold tracking-wide"
               >
                 {creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
               </button>
@@ -118,19 +118,19 @@ function App() {
                 </div>
               </section>
 
-              <section className="space-y-3">
+              <section className="space-y-3 max-w-4xl">
                 <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-on-surface-variant">Nada Risk Engine</p>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
                 <p className="text-sm text-on-surface-variant max-w-2xl">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
               </section>
 
-              <section className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-                <div className="xl:col-span-8 space-y-8">
+              <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-8 space-y-8">
                   <ScoreBreakdown />
                   <ScoreAnalysis score={creditScore} />
                 </div>
 
-                <aside className="xl:col-span-4 space-y-8 xl:sticky xl:top-28">
+                <aside className="lg:col-span-4 space-y-8 lg:sticky lg:top-28">
                   <WalletSummary />
                 </aside>
               </section>
@@ -140,7 +140,7 @@ function App() {
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pt-2 px-4 pb-4 bg-background/90 backdrop-blur-2xl border-t border-primary/15 shadow-2xl">
-        <div className="max-w-lg w-full mx-auto flex justify-around">
+        <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-8">
           <button className="flex flex-col items-center text-tertiary bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200">
             <span className="material-symbols-outlined">home</span>
             <span className="text-[10px] uppercase tracking-widest font-mono">Home</span>

@@ -28,46 +28,46 @@ const ScoreAnalysis = ({ score }) => {
   };
 
   return (
-    <section className="rounded-xl bg-surface-container-high p-5 md:p-6 ghost-border">
+    <section className="rounded-xl bg-surface-container-high p-6 md:p-7 ghost-border">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Analysis</p>
-          <h3 className="text-2xl font-bold tracking-tight mt-1">Peer & Risk Intelligence</h3>
+          <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Analysis</p>
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">Peer & Risk Intelligence</h3>
         </div>
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">Comparative Engine</span>
+        <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-tertiary">Comparative Engine</span>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Percentile Rank</p>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Percentile Rank</p>
           <p className="text-3xl font-bold mt-2 ai-shimmer">{percentile}%</p>
-          <p className="text-xs text-on-surface-variant mt-1">Against wallet cohort</p>
+          <p className="text-sm text-on-surface-variant mt-1">Against wallet cohort</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Peer Delta</p>
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Peer Delta</p>
           <p className={`text-3xl font-bold mt-2 ${delta >= 0 ? 'text-secondary' : 'text-error'}`}>{delta >= 0 ? `+${delta}` : delta}</p>
-          <p className="text-xs text-on-surface-variant mt-1">Vs average wallet score</p>
+          <p className="text-sm text-on-surface-variant mt-1">Vs average wallet score</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-4">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Risk Regime</p>
+        <div className="rounded-lg bg-surface-container-low p-5">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Risk Regime</p>
           <p className="text-3xl font-bold mt-2 text-tertiary">Stable</p>
-          <p className="text-xs text-on-surface-variant mt-1">Low downside drift</p>
+          <p className="text-sm text-on-surface-variant mt-1">Low downside drift</p>
         </div>
       </div>
 
       <div className="mt-6">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Factor Insights</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-3">
           {insights.map((insight, index) => (
-            <article key={index} className="bg-surface-container-low rounded-lg p-4 flex gap-3">
-              <span className="text-2xl leading-none">{insight.icon}</span>
-              <div>
-                <div className="font-semibold">{insight.factor}</div>
-                <div className={`inline-flex rounded-lg px-2 py-0.5 text-xs font-semibold mt-1 ${getImpactBadge(insight.impact)}`}>
-                  Impact: {insight.impact}
-                </div>
-                <p className="text-sm text-on-surface-variant mt-2">{insight.suggestion}</p>
+            <article key={index} className="bg-surface-container-low rounded-lg p-5">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl leading-none">{insight.icon}</span>
+                <div className="text-lg font-semibold leading-tight">{insight.factor}</div>
               </div>
+              <div className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold ${getImpactBadge(insight.impact)}`}>
+                  Impact: {insight.impact}
+              </div>
+              <p className="text-sm text-on-surface-variant mt-3 leading-relaxed">{insight.suggestion}</p>
             </article>
           ))}
         </div>
@@ -75,21 +75,21 @@ const ScoreAnalysis = ({ score }) => {
 
       <div className="mt-8">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Peer Comparison</h3>
-        <div className="bg-surface-container-low rounded-lg p-4 mt-3">
-          <div className="grid grid-cols-2 gap-4 mb-5">
+        <div className="bg-surface-container-low rounded-lg p-5 mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
             <div className="text-center">
-              <div className="text-4xl font-bold text-secondary">{score}</div>
-              <div className="text-xs text-on-surface-variant mt-1">Your Score</div>
+              <div className="text-4xl md:text-5xl font-bold text-secondary">{score}</div>
+              <div className="text-sm text-on-surface-variant mt-1">Your Score</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-primary">{averageScore}</div>
-              <div className="text-xs text-on-surface-variant mt-1">Average Score</div>
+              <div className="text-4xl md:text-5xl font-bold text-primary">{averageScore}</div>
+              <div className="text-sm text-on-surface-variant mt-1">Average Score</div>
             </div>
           </div>
 
           <div className="space-y-3">
             <div>
-              <div className="flex items-center justify-between text-xs mb-1">
+              <div className="flex items-center justify-between text-sm mb-1">
                 <span>Your Score</span>
                 <span>{score}/850</span>
               </div>
@@ -99,7 +99,7 @@ const ScoreAnalysis = ({ score }) => {
             </div>
 
             <div>
-              <div className="flex items-center justify-between text-xs mb-1">
+              <div className="flex items-center justify-between text-sm mb-1">
                 <span>Average Score</span>
                 <span>{averageScore}/850</span>
               </div>
@@ -109,13 +109,13 @@ const ScoreAnalysis = ({ score }) => {
             </div>
 
             <div className="pt-3 border-t border-outline-variant/20">
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Benchmark Ladder</p>
+              <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Benchmark Ladder</p>
               <div className="space-y-2">
                 {benchmarkLadder.map((row) => (
-                  <div key={row.label} className="flex items-center justify-between text-xs">
+                  <div key={row.label} className="flex items-center justify-between text-sm">
                     <span className="text-on-surface-variant">{row.label}</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-20 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                      <div className="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
                         <div
                           className="h-full bg-primary rounded-full"
                           style={{ width: `${(row.value / 850) * 100}%` }}
