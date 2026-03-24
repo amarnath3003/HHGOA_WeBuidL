@@ -58,19 +58,19 @@ function App() {
             {!address ? (
               <button
                 onClick={connectWallet}
-                className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-xs font-semibold hover:shadow-glow transition-shadow duration-300 flex items-center gap-1.5"
+                className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-xs font-semibold hover:shadow-[0_8px_30px_rgba(0,81,195,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-1.5"
               >
                 <span className="material-symbols-outlined text-sm">shield</span>
                 Connect
               </button>
             ) : (
-              <div className="flex items-center gap-2 bg-[#2a2a2a] px-3 py-1.5 rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 group cursor-pointer">
+              <div className="flex items-center gap-2 bg-[#2a2a2a] px-3 py-1.5 rounded-full hover:bg-[#353535] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 group cursor-pointer">
                 <span className="material-symbols-outlined text-xs text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>account_balance_wallet</span>
-                <span className="font-mono text-xs tracking-tight text-on-surface-variant">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+                <span className="font-mono text-xs tracking-tight text-on-surface-variant group-hover:text-white transition-colors">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
               </div>
             )}
 
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 active:opacity-80 scale-95" type="button" aria-label="Settings">
+            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] hover:-rotate-90 hover:scale-110 transition-all duration-500 active:scale-95 active:rotate-0" type="button" aria-label="Settings">
               <span className="material-symbols-outlined text-on-surface-variant">settings</span>
             </button>
           </div>
@@ -87,12 +87,13 @@ function App() {
           </section>
 
           {address && (
-            <section className="flex justify-center">
+            <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <button
                 onClick={getCreditScore}
-                className="w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-primary-container transition-colors text-background font-semibold tracking-wide"
+                className="relative overflow-hidden group w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-white transition-all text-background font-bold tracking-wide hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(177,197,255,0.4)] active:scale-95 active:translate-y-0 duration-300"
               >
-                {creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
+                <div className="absolute inset-0 w-full h-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                <span className="relative z-10">{creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}</span>
               </button>
             </section>
           )}
@@ -141,17 +142,17 @@ function App() {
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-[#131313]/90 backdrop-blur-2xl rounded-t-3xl border-t border-[#b1c5ff]/15 shadow-2xl">
         <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-16">
-          <button className="flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200">
-            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+          <button className="group flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-300 hover:shadow-glow hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
             <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
           </button>
-          <button className="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all">
-            <span className="material-symbols-outlined">history</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">History</span>
+          <button className="group flex flex-col items-center justify-center text-gray-500 hover:text-[#cdbdff] px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">history</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-[#cdbdff] transition-colors">History</span>
           </button>
-          <button className="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all">
-            <span className="material-symbols-outlined">verified_user</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Security</span>
+          <button className="group flex flex-col items-center justify-center text-gray-500 hover:text-[#cdbdff] px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">verified_user</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-[#cdbdff] transition-colors">Security</span>
           </button>
         </div>
       </nav>
