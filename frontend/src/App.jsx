@@ -47,44 +47,50 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface app-safe-bottom">
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 sm:px-6 pt-4">
-        <div className="mx-auto max-w-6xl rounded-xl bg-background/80 backdrop-blur-glass shadow-ambient ghost-border px-4 py-3 flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full z-50 px-6 py-4 bg-background/80 backdrop-blur-glass shadow-ambient">
+        <div className="mx-auto max-w-5xl flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-tertiary">security</span>
-            <h1 className="text-xl font-bold tracking-tight text-tertiary">EtherScore</h1>
+            <h1 className="text-xl font-bold tracking-tighter text-tertiary">EtherScore</h1>
           </div>
 
-          {!address ? (
-            <button
-              onClick={connectWallet}
-              className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-sm font-semibold hover:shadow-glow transition-shadow duration-300 flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-base">shield</span>
-              Connect Wallet
+          <div className="flex items-center gap-3">
+            {!address ? (
+              <button
+                onClick={connectWallet}
+                className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-xs font-semibold hover:shadow-glow transition-shadow duration-300 flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">shield</span>
+                Connect
+              </button>
+            ) : (
+              <div className="rounded-full px-3 py-1.5 bg-surface-container-high text-xs text-on-surface-variant font-mono flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-tertiary">account_balance_wallet</span>
+                {`${address.slice(0, 6)}...${address.slice(-4)}`}
+              </div>
+            )}
+
+            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors" type="button" aria-label="Settings">
+              <span className="material-symbols-outlined text-on-surface-variant">settings</span>
             </button>
-          ) : (
-            <div className="rounded-full px-4 py-2 bg-surface-container-high text-sm text-on-surface-variant font-mono flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm text-primary">verified_user</span>
-              {`${address.slice(0, 6)}...${address.slice(-4)}`}
-            </div>
-          )}
+          </div>
         </div>
       </header>
 
-      <main className="pt-24 px-4 sm:px-6">
-        <div className="mx-auto max-w-6xl">
+      <main className="pt-24 px-6 max-w-lg mx-auto space-y-8">
+        <div className="mx-auto max-w-lg space-y-8">
           <section className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-container/20 text-tertiary ghost-border shadow-ambient">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-container/20 text-tertiary border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
               <span className="material-symbols-outlined text-sm">verified</span>
               <span className="text-xs uppercase tracking-widest font-mono">Nada AI Protected</span>
             </div>
           </section>
 
           {address && (
-            <section className="mt-8 flex justify-center">
+            <section className="flex justify-center">
               <button
                 onClick={getCreditScore}
-                className="w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-primary-container transition-colors text-background font-semibold tracking-wide"
+                className="w-full rounded-full py-3 px-6 bg-primary hover:bg-primary-container transition-colors text-background font-semibold tracking-wide"
               >
                 {creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
               </button>
@@ -101,51 +107,43 @@ function App() {
             <>
               <CreditScoreSpeedometer score={creditScore} />
 
-              <section className="editorial-section grid grid-cols-1 md:grid-cols-3 gap-4">
+              <section className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Model Integrity</p>
-                  <p className="text-lg font-bold mt-2">98.2%</p>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Total Assets</p>
+                  <p className="text-lg font-bold mt-2">$45,230</p>
                 </div>
                 <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Wallet Cohesion</p>
-                  <p className="text-lg font-bold mt-2 text-secondary">Strong</p>
-                </div>
-                <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Risk Band</p>
-                  <p className="text-lg font-bold mt-2 text-tertiary">Prime</p>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Trust Score</p>
+                  <p className="text-lg font-bold mt-2 text-tertiary">High</p>
                 </div>
               </section>
 
-              <section className="editorial-section grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-                <div className="xl:col-span-5">
-                  <WalletSummary />
-                </div>
-                <div className="xl:col-span-7 space-y-8">
-                  <ScoreBreakdown />
-                  <ScoreAnalysis score={creditScore} />
-                </div>
+              <section className="space-y-8">
+                <WalletSummary />
+                <ScoreBreakdown />
+                <ScoreAnalysis score={creditScore} />
               </section>
             </>
           )}
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 px-4 sm:px-6 pb-4">
-        <div className="mx-auto max-w-6xl rounded-t-xl rounded-b-xl bg-background/90 backdrop-blur-glass ghost-border px-4 py-2 flex items-center justify-around shadow-ambient">
-          <button className="flex flex-col items-center text-tertiary px-3 py-1.5 rounded-lg bg-tertiary/10">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pt-2 px-4 pb-4 bg-background/90 backdrop-blur-2xl border-t border-primary/15 shadow-2xl">
+        <div className="max-w-lg w-full mx-auto flex justify-around">
+          <button className="flex flex-col items-center text-tertiary bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200">
             <span className="material-symbols-outlined">home</span>
             <span className="text-[10px] uppercase tracking-widest font-mono">Home</span>
           </button>
-          <button className="flex flex-col items-center text-on-surface-variant px-3 py-1.5 rounded-lg hover:text-on-surface transition-colors">
+          <button className="flex flex-col items-center text-on-surface-variant px-4 py-2 rounded-lg hover:text-tertiary transition-colors">
             <span className="material-symbols-outlined">history</span>
             <span className="text-[10px] uppercase tracking-widest font-mono">History</span>
           </button>
-          <button className="flex flex-col items-center text-on-surface-variant px-3 py-1.5 rounded-lg hover:text-on-surface transition-colors">
+          <button className="flex flex-col items-center text-on-surface-variant px-4 py-2 rounded-lg hover:text-tertiary transition-colors">
             <span className="material-symbols-outlined">verified_user</span>
             <span className="text-[10px] uppercase tracking-widest font-mono">Security</span>
           </button>
         </div>
-      </div>
+      </nav>
     </div>
   );
 }
