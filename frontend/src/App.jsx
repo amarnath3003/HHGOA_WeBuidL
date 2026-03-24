@@ -46,12 +46,12 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface app-safe-bottom">
-      <header className="fixed top-0 left-0 w-full z-50 px-4 sm:px-6 lg:px-8 py-4 bg-background/80 backdrop-blur-glass shadow-ambient">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
+    <div className="min-h-screen bg-[#131313] text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#131313]/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
+        <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-tertiary">security</span>
-            <h1 className="text-xl font-bold tracking-tighter text-tertiary">EtherScore</h1>
+            <span className="material-symbols-outlined text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
+            <h1 className="text-xl font-bold tracking-tighter text-tertiary-fixed-dim">EtherScore</h1>
           </div>
 
           <div className="flex items-center gap-3">
@@ -64,13 +64,13 @@ function App() {
                 Connect
               </button>
             ) : (
-              <div className="rounded-full px-3 py-1.5 bg-surface-container-high text-xs text-on-surface-variant font-mono flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm text-tertiary">account_balance_wallet</span>
-                {`${address.slice(0, 6)}...${address.slice(-4)}`}
+              <div className="flex items-center gap-2 bg-[#2a2a2a] px-3 py-1.5 rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 group cursor-pointer">
+                <span className="material-symbols-outlined text-xs text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>account_balance_wallet</span>
+                <span className="font-mono text-xs tracking-tight text-on-surface-variant">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
               </div>
             )}
 
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors" type="button" aria-label="Settings">
+            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 active:opacity-80 scale-95" type="button" aria-label="Settings">
               <span className="material-symbols-outlined text-on-surface-variant">settings</span>
             </button>
           </div>
@@ -80,9 +80,9 @@ function App() {
       <main className="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="mx-auto w-full max-w-7xl space-y-8">
           <section className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tertiary-container/20 text-tertiary border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
-              <span className="material-symbols-outlined text-sm">verified</span>
-              <span className="text-xs uppercase tracking-widest font-mono">Nada AI Protected</span>
+            <div className="flex items-center gap-2 px-4 py-1.5 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
+              <span className="material-symbols-outlined text-tertiary-fixed-dim text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+              <span className="text-tertiary-fixed-dim text-[11px] sm:text-xs uppercase tracking-widest font-mono">Nada AI Protected</span>
             </div>
           </section>
 
@@ -108,13 +108,13 @@ function App() {
               <CreditScoreSpeedometer score={creditScore} />
 
               <section className="grid grid-cols-2 gap-4">
-                <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Total Assets</p>
-                  <p className="text-lg font-bold mt-2">$45,230</p>
+                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+                  <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
+                  <div className="text-lg font-bold text-on-surface">$45,230</div>
                 </div>
-                <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
-                  <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Trust Score</p>
-                  <p className="text-lg font-bold mt-2 text-tertiary">High</p>
+                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+                  <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
+                  <div className="text-lg font-bold text-tertiary-fixed-dim">High</div>
                 </div>
               </section>
 
@@ -139,19 +139,19 @@ function App() {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pt-2 px-4 pb-4 bg-background/90 backdrop-blur-2xl border-t border-primary/15 shadow-2xl">
-        <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-8">
-          <button className="flex flex-col items-center text-tertiary bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200">
-            <span className="material-symbols-outlined">home</span>
-            <span className="text-[10px] uppercase tracking-widest font-mono">Home</span>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-[#131313]/90 backdrop-blur-2xl rounded-t-3xl border-t border-[#b1c5ff]/15 shadow-2xl">
+        <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-16">
+          <button className="flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200">
+            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
           </button>
-          <button className="flex flex-col items-center text-on-surface-variant px-4 py-2 rounded-lg hover:text-tertiary transition-colors">
+          <button className="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all">
             <span className="material-symbols-outlined">history</span>
-            <span className="text-[10px] uppercase tracking-widest font-mono">History</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">History</span>
           </button>
-          <button className="flex flex-col items-center text-on-surface-variant px-4 py-2 rounded-lg hover:text-tertiary transition-colors">
+          <button className="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all">
             <span className="material-symbols-outlined">verified_user</span>
-            <span className="text-[10px] uppercase tracking-widest font-mono">Security</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Security</span>
           </button>
         </div>
       </nav>

@@ -18,14 +18,14 @@ const CreditScoreSpeedometer = ({ score }) => {
         <div className="absolute inset-0 rounded-full border-[12px] border-surface-container-highest opacity-30"></div>
 
         <div
-          className="absolute inset-0 rounded-full border-[12px] border-transparent border-t-tertiary border-r-tertiary border-l-primary opacity-95 transition-transform duration-700"
+          className="absolute inset-0 rounded-full border-[12px] border-transparent border-t-tertiary border-r-tertiary border-l-tertiary-fixed-dim opacity-90 transition-transform duration-700"
           style={{ transform: `rotate(${rotation}deg)` }}
         ></div>
 
-        <div className="glass-card ghost-border rounded-full w-52 h-52 sm:w-56 sm:h-56 md:w-64 md:h-64 flex items-center justify-center flex-col ai-pulse">
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-on-surface-variant">Credit Score</span>
-          <div className="text-5xl sm:text-6xl md:text-7xl leading-none font-extrabold tracking-tighter ai-shimmer mt-2">{score}</div>
-          <span className="mt-2 rounded-full px-3 py-0.5 text-[10px] uppercase tracking-[0.2em] bg-secondary/20 text-secondary font-semibold">{getBand(score)}</span>
+        <div className="glass-card shadow-2xl border border-white/5 rounded-full w-52 h-52 sm:w-56 sm:h-56 md:w-64 md:h-64 flex flex-col items-center justify-center ai-pulse">
+          <span className="text-[0.65rem] font-mono tracking-[0.3em] text-on-surface-variant uppercase mb-1">Credit Score</span>
+          <div className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter text-transparent bg-clip-text ai-shimmer mt-1">{score}</div>
+          <span className="mt-2 rounded-full px-3 py-0.5 text-[10px] uppercase tracking-wider bg-secondary/20 text-secondary font-bold">{getBand(score)}</span>
         </div>
 
         <div className="absolute -z-10 w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-tertiary/20 blur-[80px]"></div>
