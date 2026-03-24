@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#4cd6ff",
+              "primary": "#b1c5ff",
+              "on-tertiary": "#370096",
+              "inverse-surface": "#e4e2e1",
+              "on-error": "#690005",
+              "on-secondary-fixed": "#001f28",
+              "on-primary-fixed-variant": "#00419f",
+              "outline-variant": "#434653",
+              "on-surface": "#e4e2e1",
+              "surface-tint": "#b1c5ff",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-lowest": "#0e0e0e",
+              "on-primary-container": "#beceff",
+              "on-primary": "#002c71",
+              "on-secondary-fixed-variant": "#004e60",
+              "secondary": "#a6e6ff",
+              "error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#4f00d0",
+              "surface-container": "#1f2020",
+              "surface": "#131313",
+              "surface-container-low": "#1b1c1c",
+              "surface-dim": "#131313",
+              "primary-fixed": "#dae2ff",
+              "on-primary-fixed": "#001947",
+              "inverse-primary": "#1357c9",
+              "primary-container": "#0051c3",
+              "on-surface-variant": "#c3c6d6",
+              "on-secondary": "#003543",
+              "inverse-on-surface": "#303030",
+              "surface-bright": "#393939",
+              "tertiary-container": "#622ae4",
+              "error": "#ffb4ab",
+              "on-tertiary-container": "#d5c8ff",
+              "tertiary-fixed": "#e8deff",
+              "on-tertiary-fixed": "#20005f",
+              "background": "#131313",
+              "secondary-container": "#14d1ff",
+              "primary-fixed-dim": "#b1c5ff",
+              "tertiary-fixed-dim": "#cdbdff",
+              "on-error-container": "#ffdad6",
+              "surface-variant": "#353535",
+              "outline": "#8d909f",
+              "surface-container-highest": "#353535",
+              "on-secondary-container": "#00566b",
+              "secondary-fixed": "#b7eaff",
+              "on-background": "#e4e2e1"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .ai-shimmer {
+            background: linear-gradient(45deg, #cdbdff, #622ae4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(31, 32, 32, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .meter-gradient {
+            background: conic-gradient(from 180deg at 50% 50%, #cdbdff 0deg, #622ae4 280deg, transparent 280deg);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+        .ai-shimmer {
+            background: linear-gradient(45deg, #cdbdff, #622ae4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(31, 32, 32, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .meter-gradient {
+            background: conic-gradient(from 180deg at 50% 50%, #cdbdff 0deg, #622ae4 280deg, transparent 280deg);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen pb-32 selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#131313]/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="security">security</span>
+<h1 class="text-xl font-bold tracking-tighter text-tertiary-fixed-dim">EtherScore</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-[#2a2a2a] px-3 py-1.5 rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 group cursor-pointer">
+<span class="material-symbols-outlined text-xs text-tertiary-fixed-dim" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-mono text-xs tracking-tight text-on-surface-variant">0x...4f2e</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] transition-colors duration-300 active:opacity-80 scale-95">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-lg mx-auto space-y-8">
+<!-- Privacy Badge -->
+<div class="flex justify-center">
+<div class="flex items-center gap-2 px-4 py-1.5 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm">Nada AI Protected</span>
+</div>
+</div>
+<!-- Hero: Credit Score Meter -->
+<section class="relative flex flex-col items-center justify-center py-6">
+<div class="relative w-72 h-72 flex items-center justify-center">
+<!-- Outer Track -->
+<div class="absolute inset-0 rounded-full border-[12px] border-surface-container-highest opacity-30"></div>
+<!-- Active Progress (CSS Simulation) -->
+<div class="absolute inset-0 rounded-full border-[12px] border-transparent border-t-tertiary border-r-tertiary border-l-tertiary-fixed-dim rotate-45 opacity-90"></div>
+<div class="flex flex-col items-center glass-card w-56 h-56 rounded-full flex items-center justify-center shadow-2xl border border-white/5">
+<span class="text-[0.65rem] font-mono tracking-[0.3em] text-on-surface-variant uppercase mb-1">Credit Score</span>
+<span class="text-6xl font-extrabold tracking-tighter text-transparent bg-clip-text ai-shimmer">785</span>
+<span class="mt-2 px-3 py-0.5 rounded-full bg-secondary/20 text-secondary text-[10px] font-bold uppercase tracking-wider">Excellent</span>
+</div>
+<!-- Ambient Glow -->
+<div class="absolute -z-10 w-64 h-64 bg-tertiary/20 blur-[80px] rounded-full"></div>
+</div>
+</section>
+<!-- Stats Grid -->
+<section class="grid grid-cols-2 gap-4">
+<div class="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+<span class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest">Total Assets</span>
+<div class="text-lg font-bold text-on-surface">$45,230</div>
+</div>
+<div class="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+<span class="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest">Trust Score</span>
+<div class="text-lg font-bold text-tertiary-fixed-dim">High</div>
+</div>
+</section>
+<!-- Assets Section -->
+<section class="space-y-4">
+<div class="flex justify-between items-end">
+<h2 class="text-sm font-bold tracking-tight text-on-surface uppercase">On-Chain Assets</h2>
+<span class="text-[10px] font-mono text-tertiary-fixed-dim/70">Verified by Nada</span>
+</div>
+<div class="space-y-3">
+<!-- USDT Balance -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="currency_exchange">currency_exchange</span>
+</div>
+<div>
+<div class="text-sm font-semibold">USDT Balance</div>
+<div class="text-[10px] font-mono text-on-surface-variant">Tether USD</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-mono font-bold text-tertiary-fixed-dim">$12,450.00</div>
+<div class="text-[10px] text-on-surface-variant">ERC-20</div>
+</div>
+</div>
+<!-- ENS Name -->
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container-low border border-white/5 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="alternate_email">alternate_email</span>
+</div>
+<div>
+<div class="text-sm font-semibold">ENS Identity</div>
+<div class="text-[10px] font-mono text-on-surface-variant">etherean.eth</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="open_in_new">open_in_new</span>
+</div>
+</div>
+</section>
+<!-- NFT Scroll -->
+<section class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-sm font-bold tracking-tight text-on-surface uppercase">Collections</h2>
+<span class="text-[10px] font-mono text-on-surface-variant">4 Assets</span>
+</div>
+<div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+<div class="flex-shrink-0 w-32 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="abstract digital art with vibrant neon blues and purples in a futuristic geometric pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDci78KxS17idunlScV4zNuG6OpZvdV8Bq9LsZPkeD-pC4TGmP7dBSm3GfBlQh8faTdt6gg6Axzkm-1SiapUqKf-oUcgLB4Eep3cjUaC20108PovnyGoXz6MzpudNwgTMQDv5JWzYM4QdyXTwSNM6jR8TnB0YRXEXyClkxxkeB7iOzAKY4PpkL2m1iOjRBh7Pg60dFFVFqObOxqGz7JU2Q7a4Ao7Eqa1jWxB2qkLbE672pf_ZBM0rRPwjQI2GzQEniLsCfCgYA8gREK"/>
+</div>
+<div class="text-[10px] font-bold truncate">Ethereal Void #42</div>
+</div>
+<div class="flex-shrink-0 w-32 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="3D rendered crystalline structure glowing with soft iridescent light against a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATgc7JMnhaseVaBONcZXXgcSRRH0sj9aTBII8D6cmJE8wLTdk6XpUu7r4rzuMHImGugkcG85eFvTg1X5MmEW0sF09Uk3JQnQKtK4u9pXo5GyN3j4Gv18JiX5w6XXyYQcQVej6d7FDfLewbktbEtEdEGNxNm-6u7chDi3E9EWftceMOOtfAebg8XJ12bTEjnXH7g8FSbYdn0lKJT9g4Sgl_h70_VmPO-wo78SvFVOrQuK4QZsAhTyX452cVlRm8XLei_nUbpKE3__JK"/>
+</div>
+<div class="text-[10px] font-bold truncate">Crystal Node #109</div>
+</div>
+<div class="flex-shrink-0 w-32 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="minimalist wave patterns flowing with deep blue and violet gradients and grainy texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW_F5Nl2zAVt1ZHB7jfreqiMHzVGzNZ9-M4IEAGubT_4w-RQeA95tJZ5Y-xfh7hFHTZ72C1yr74Qh42HwOSxixgK_yFMeALN_UJPTRLita_oUuyzokNP-awL2L-220y2LCCeIq_tJ893U1ixubjTlG5Z0uAtRHeW0S9WEi-gcbWuEypEJHGMfVw7FhCkNscMtkNYyexfM9g4VRfFz5SWIQge4LW-A688FmfeG3xKU5GuePvYNfK2o1OWG4LSzRFhl_D6KKpnhL-tXu"/>
+</div>
+<div class="text-[10px] font-bold truncate">Pulse Wave #01</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pb-safe pt-2 px-4 bg-[#131313]/90 backdrop-blur-2xl rounded-t-3xl border-t border-[#b1c5ff]/15 shadow-2xl">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
+</a>
+<!-- History -->
+<a class="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-mono text-[10px] uppercase tracking-widest mt-1">History</span>
+</a>
+<!-- Security -->
+<a class="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-2 hover:text-[#cdbdff] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-mono text-[10px] uppercase tracking-widest mt-1">Security</span>
+</a>
+</nav>
+</body></html>
