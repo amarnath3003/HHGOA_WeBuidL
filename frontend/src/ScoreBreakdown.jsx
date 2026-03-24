@@ -66,18 +66,24 @@ const ScoreBreakdown = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Top Factor</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">star</span> Top Factor
+          </p>
           <p className="text-base font-semibold mt-2">{topFactor.name}</p>
           <p className="text-sm text-tertiary mt-1">{topFactor.percentage}% weight</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Model Confidence</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">verified_user</span> Model Confidence
+          </p>
           <p className="text-base font-semibold mt-2">High</p>
           <p className="text-sm text-secondary mt-1">Stable over 90 days</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Volatility</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">trending_up</span> Volatility
+          </p>
           <p className="text-base font-semibold mt-2">Low</p>
           <p className="text-sm text-primary mt-1">Predictive drift: 1.9%</p>
         </div>
@@ -99,17 +105,17 @@ const ScoreBreakdown = () => {
           };
 
           return (
-            <article key={index} className="rounded-lg bg-surface-container-low p-5">
+            <article key={index} className="group rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
               <div className="flex justify-between items-start gap-2 mb-3">
                 <div>
-                  <span className="text-base font-medium leading-tight">{factor.name}</span>
+                  <span className="text-base font-medium leading-tight group-hover:text-white transition-colors">{factor.name}</span>
                   <p className="text-sm text-on-surface-variant mt-1">{factor.impact}</p>
                 </div>
-                <span className="rounded-lg px-2.5 py-1 text-xs font-semibold bg-secondary-container/20 text-secondary">{factor.percentage}%</span>
+                <span className="rounded-lg px-2.5 py-1 text-xs font-semibold bg-secondary-container/20 text-secondary transition-transform duration-300 group-hover:scale-105">{factor.percentage}%</span>
               </div>
 
               <div className="h-2 bg-surface-container-highest rounded-full overflow-hidden mb-3">
-                <div className="h-full rounded-full" style={{ width: `${factor.percentage}%`, backgroundColor: factor.color }}></div>
+                <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${factor.percentage}%`, backgroundColor: factor.color }}></div>
               </div>
 
               <div style={{ height: '72px' }}>
