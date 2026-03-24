@@ -8,6 +8,14 @@ const ScoreAnalysis = ({ score }) => {
   ];
 
   const averageScore = 720;
+  const delta = score - averageScore;
+  const percentile = Math.max(1, Math.min(99, Math.round(((score - 300) / 550) * 100)));
+  const benchmarkLadder = [
+    { label: 'Top 10%', value: 790 },
+    { label: 'Top 25%', value: 760 },
+    { label: 'Median', value: 705 },
+    { label: 'Bottom 25%', value: 640 },
+  ];
 
   const getImpactBadge = (impact) => {
     if (impact === 'High') {
@@ -20,8 +28,32 @@ const ScoreAnalysis = ({ score }) => {
   };
 
   return (
-    <section className="rounded-xl bg-surface-container-high p-5 ghost-border">
-      <h2 className="text-lg font-bold tracking-tight">Score Analysis</h2>
+    <section className="rounded-xl bg-surface-container-high p-5 md:p-6 ghost-border">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Analysis</p>
+          <h3 className="text-2xl font-bold tracking-tight mt-1">Peer & Risk Intelligence</h3>
+        </div>
+        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">Comparative Engine</span>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Percentile Rank</p>
+          <p className="text-3xl font-bold mt-2 ai-shimmer">{percentile}%</p>
+          <p className="text-xs text-on-surface-variant mt-1">Against wallet cohort</p>
+        </div>
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Peer Delta</p>
+          <p className={`text-3xl font-bold mt-2 ${delta >= 0 ? 'text-secondary' : 'text-error'}`}>{delta >= 0 ? `+${delta}` : delta}</p>
+          <p className="text-xs text-on-surface-variant mt-1">Vs average wallet score</p>
+        </div>
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Risk Regime</p>
+          <p className="text-3xl font-bold mt-2 text-tertiary">Stable</p>
+          <p className="text-xs text-on-surface-variant mt-1">Low downside drift</p>
+        </div>
+      </div>
 
       <div className="mt-6">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Factor Insights</h3>
@@ -44,7 +76,7 @@ const ScoreAnalysis = ({ score }) => {
       <div className="mt-8">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Peer Comparison</h3>
         <div className="bg-surface-container-low rounded-lg p-4 mt-3">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-5">
             <div className="text-center">
               <div className="text-4xl font-bold text-secondary">{score}</div>
               <div className="text-xs text-on-surface-variant mt-1">Your Score</div>
@@ -73,6 +105,26 @@ const ScoreAnalysis = ({ score }) => {
               </div>
               <div className="h-2 bg-surface-container-highest rounded-full overflow-hidden">
                 <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${(averageScore / 850) * 100}%` }}></div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-outline-variant/20">
+              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Benchmark Ladder</p>
+              <div className="space-y-2">
+                {benchmarkLadder.map((row) => (
+                  <div key={row.label} className="flex items-center justify-between text-xs">
+                    <span className="text-on-surface-variant">{row.label}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{ width: `${(row.value / 850) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="font-mono text-on-surface">{row.value}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
