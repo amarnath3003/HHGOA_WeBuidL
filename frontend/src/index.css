@@ -1,3 +1,67 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+	color-scheme: dark;
+}
+
+@layer base {
+	html,
+	body,
+	#root {
+		min-height: 100%;
+	}
+
+	body {
+		@apply bg-background text-on-surface font-body antialiased;
+		margin: 0;
+	}
+}
+
+@layer utilities {
+	.ai-shimmer {
+		background: linear-gradient(45deg, #b1c5ff, #cdbdff);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.ai-track {
+		stroke: url(#aiGradient);
+	}
+
+	.glass-card {
+		background: rgba(31, 32, 32, 0.8);
+		backdrop-filter: blur(20px);
+	}
+
+	.ghost-border {
+		border: 1px solid rgba(67, 70, 83, 0.15);
+	}
+
+	.ai-pulse {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.ai-pulse::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		transform: translateX(-110%);
+		background: linear-gradient(90deg, transparent, rgba(177, 197, 255, 0.25), transparent);
+		animation: ai-scan 3.2s infinite;
+		pointer-events: none;
+	}
+
+	.editorial-section {
+		margin-top: 5.5rem;
+	}
+}
+
+@keyframes ai-scan {
+	to {
+		transform: translateX(110%);
+	}
+}
