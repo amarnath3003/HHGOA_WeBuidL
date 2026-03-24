@@ -18,26 +18,41 @@ const WalletSummary = () => {
   ];
 
   return (
-    <div className="wallet-summary">
-      <h2>Wallet Summary</h2>
-      <div className="balance">
-        <span>Balance: {balance}</span>
+    <section className="space-y-5">
+      <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-lg font-bold tracking-tight">Wallet Summary</h2>
+            <p className="mt-1 text-xs text-on-surface-variant">AI-verifiable portfolio posture</p>
+          </div>
+          <span className="material-symbols-outlined text-tertiary">account_balance_wallet</span>
+        </div>
+
+        <div className="mt-5 rounded-lg bg-surface-container-low p-4">
+          <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Stablecoin Liquidity</div>
+          <div className="mt-2 text-2xl font-bold ai-shimmer">{balance}</div>
+        </div>
       </div>
-      <div className="nft-holdings">
-        <span>NFT Holdings:</span>
-        <div className="nft-grid">
+
+      <div className="rounded-xl bg-surface-container-high p-5 ghost-border">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-sm font-semibold">NFT Holdings</span>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-on-surface-variant">2 Assets</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {nfts.map(nft => (
-            <div key={nft.id} className="nft-card">
-              <img src={nft.thumbnail} alt={nft.name} className="nft-image" />
-              <div className="nft-info">
-                <p>{nft.name}</p>
-                <p>Last sale: {nft.lastSale}</p>
+            <article key={nft.id} className="rounded-lg bg-surface-container-low overflow-hidden">
+              <img src={nft.thumbnail} alt={nft.name} className="h-44 w-full object-cover" />
+              <div className="p-3 space-y-1">
+                <p className="text-sm font-semibold truncate">{nft.name}</p>
+                <p className="text-xs font-mono text-on-surface-variant">Last Sale: {nft.lastSale}</p>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
