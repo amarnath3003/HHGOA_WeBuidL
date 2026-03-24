@@ -118,10 +118,21 @@ function App() {
                 </div>
               </section>
 
-              <section className="space-y-8">
-                <WalletSummary />
-                <ScoreBreakdown />
-                <ScoreAnalysis score={creditScore} />
+              <section className="space-y-3">
+                <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-on-surface-variant">Nada Risk Engine</p>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
+                <p className="text-sm text-on-surface-variant max-w-2xl">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
+              </section>
+
+              <section className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                <div className="xl:col-span-8 space-y-8">
+                  <ScoreBreakdown />
+                  <ScoreAnalysis score={creditScore} />
+                </div>
+
+                <aside className="xl:col-span-4 space-y-8 xl:sticky xl:top-28">
+                  <WalletSummary />
+                </aside>
               </section>
             </>
           )}
