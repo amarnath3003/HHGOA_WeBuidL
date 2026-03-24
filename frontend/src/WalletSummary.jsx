@@ -34,33 +34,33 @@ const WalletSummary = () => {
         </div>
 
         <div className="space-y-3">
-          <article className="flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-colors gap-3">
+          <article className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-tertiary">currency_exchange</span>
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold">USDT Balance</div>
+                <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">USDT Balance</div>
                 <div className="text-xs font-mono text-on-surface-variant">Tether USD</div>
               </div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-sm md:text-base font-mono font-bold text-tertiary">{balance}</div>
+              <div className="text-sm md:text-base font-mono font-bold text-tertiary">$12,450.00</div>
               <div className="text-xs text-on-surface-variant">ERC-20</div>
             </div>
           </article>
 
-          <article className="flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-colors gap-3">
+          <article className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <span className="material-symbols-outlined text-tertiary">alternate_email</span>
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold">ENS Identity</div>
-                <div className="text-xs font-mono text-on-surface-variant truncate">{ensName}</div>
+                <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">ENS Identity</div>
+                <div className="text-xs font-mono text-on-surface-variant truncate">etherean.eth</div>
               </div>
             </div>
-            <span className="material-symbols-outlined text-on-surface-variant text-sm">open_in_new</span>
+            <span className="material-symbols-outlined text-on-surface-variant text-sm group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300">open_in_new</span>
           </article>
         </div>
       </div>
@@ -71,13 +71,13 @@ const WalletSummary = () => {
           <span className="text-[11px] font-mono text-on-surface-variant">{nfts.length} Assets</span>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-2">
           {nfts.map((nft) => (
-            <article key={nft.id} className="flex-shrink-0 w-40 group cursor-pointer">
-              <div className="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2">
-                <img src={nft.thumbnail} alt={nft.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <article key={nft.id} className="flex-shrink-0 w-40 group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
+              <div className="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2 shadow-sm group-hover:shadow-lg group-hover:shadow-tertiary-fixed-dim/20 transition-all duration-300">
+                <img src={nft.thumbnail} alt={nft.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
               </div>
-              <div className="text-xs font-bold truncate">{nft.name}</div>
+              <div className="text-xs font-bold truncate group-hover:text-tertiary-fixed-dim transition-colors">{nft.name}</div>
             </article>
           ))}
         </div>

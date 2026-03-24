@@ -38,19 +38,25 @@ const ScoreAnalysis = ({ score }) => {
       </div>
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Percentile Rank</p>
-          <p className="text-3xl font-bold mt-2 ai-shimmer">{percentile}%</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">leaderboard</span> Percentile Rank
+          </p>
+          <p className="text-3xl font-bold mt-2 ai-shimmer drop-shadow-sm">{percentile}%</p>
           <p className="text-sm text-on-surface-variant mt-1">Against wallet cohort</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Peer Delta</p>
-          <p className={`text-3xl font-bold mt-2 ${delta >= 0 ? 'text-secondary' : 'text-error'}`}>{delta >= 0 ? `+${delta}` : delta}</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">compare_arrows</span> Peer Delta
+          </p>
+          <p className={`text-3xl font-bold mt-2 ${delta >= 0 ? 'text-secondary' : 'text-error'} drop-shadow-sm`}>{delta >= 0 ? `+${delta}` : delta}</p>
           <p className="text-sm text-on-surface-variant mt-1">Vs average wallet score</p>
         </div>
-        <div className="rounded-lg bg-surface-container-low p-5">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Risk Regime</p>
-          <p className="text-3xl font-bold mt-2 text-tertiary">Stable</p>
+        <div className="rounded-lg bg-surface-container-low p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">monitoring</span> Risk Regime
+          </p>
+          <p className="text-3xl font-bold mt-2 text-tertiary drop-shadow-sm">Stable</p>
           <p className="text-sm text-on-surface-variant mt-1">Low downside drift</p>
         </div>
       </div>
@@ -59,10 +65,10 @@ const ScoreAnalysis = ({ score }) => {
         <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Factor Insights</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-3">
           {insights.map((insight, index) => (
-            <article key={index} className="bg-surface-container-low rounded-lg p-5">
+            <article key={index} className="group bg-surface-container-low rounded-lg p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl leading-none">{insight.icon}</span>
-                <div className="text-lg font-semibold leading-tight">{insight.factor}</div>
+                <span className="text-2xl leading-none group-hover:scale-110 transition-transform duration-300">{insight.icon}</span>
+                <div className="text-lg font-semibold leading-tight group-hover:text-white transition-colors">{insight.factor}</div>
               </div>
               <div className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold ${getImpactBadge(insight.impact)}`}>
                   Impact: {insight.impact}

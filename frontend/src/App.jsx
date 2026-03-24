@@ -106,26 +106,28 @@ function App() {
 
           {creditScore && (
             <>
-              <CreditScoreSpeedometer score={creditScore} />
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+                <CreditScoreSpeedometer score={creditScore} />
+              </div>
 
-              <section className="grid grid-cols-2 gap-4">
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+              <section className="grid grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
                   <div className="text-lg font-bold text-on-surface">$45,230</div>
                 </div>
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1">
+                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
                   <div className="text-lg font-bold text-tertiary-fixed-dim">High</div>
                 </div>
               </section>
 
-              <section className="space-y-3 max-w-4xl">
+              <section className="space-y-3 max-w-4xl opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
                 <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-on-surface-variant">Nada Risk Engine</p>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
                 <p className="text-sm text-on-surface-variant max-w-2xl">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
               </section>
 
-              <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
                 <div className="lg:col-span-8 space-y-8">
                   <ScoreBreakdown />
                   <ScoreAnalysis score={creditScore} />
