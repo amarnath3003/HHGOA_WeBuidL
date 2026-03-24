@@ -6,11 +6,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const ScoreBreakdown = () => {
   const factors = [
-    { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff' },
-    { name: 'Transaction History', percentage: 25, color: '#b1c5ff' },
-    { name: 'NFT Holdings', percentage: 20, color: '#cdbdff' },
-    { name: 'Account Age', percentage: 15, color: '#14d1ff' },
-    { name: 'Network Diversity', percentage: 10, color: '#7f72ff' },
+    { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', impact: 'Primary driver' },
+    { name: 'Transaction History', percentage: 25, color: '#b1c5ff', impact: 'Behavioral consistency' },
+    { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', impact: 'Asset credibility' },
+    { name: 'Account Age', percentage: 15, color: '#14d1ff', impact: 'Longevity signal' },
+    { name: 'Network Diversity', percentage: 10, color: '#7f72ff', impact: 'Cross-chain resilience' },
   ];
 
   const generateMockData = () => {
@@ -19,6 +19,7 @@ const ScoreBreakdown = () => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
@@ -52,11 +53,34 @@ const ScoreBreakdown = () => {
     },
   };
 
+  const topFactor = factors[0];
+
   return (
-    <section className="rounded-xl bg-surface-container-high p-5 ghost-border">
-      <div className="flex justify-between items-center mb-5">
-        <h2 className="text-lg font-bold tracking-tight">Score Breakdown</h2>
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Weighted Factors</span>
+    <section className="rounded-xl bg-surface-container-high p-5 md:p-6 ghost-border">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+        <div>
+          <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Breakdown</p>
+          <h3 className="text-2xl font-bold tracking-tight mt-1">Factor Contribution Matrix</h3>
+        </div>
+        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">Weighted / Dynamic</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Top Factor</p>
+          <p className="text-sm font-semibold mt-2">{topFactor.name}</p>
+          <p className="text-xs text-tertiary mt-1">{topFactor.percentage}% weight</p>
+        </div>
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Model Confidence</p>
+          <p className="text-sm font-semibold mt-2">High</p>
+          <p className="text-xs text-secondary mt-1">Stable over 90 days</p>
+        </div>
+        <div className="rounded-lg bg-surface-container-low p-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">Volatility</p>
+          <p className="text-sm font-semibold mt-2">Low</p>
+          <p className="text-xs text-primary mt-1">Predictive drift: 1.9%</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -76,10 +100,18 @@ const ScoreBreakdown = () => {
 
           return (
             <article key={index} className="rounded-lg bg-surface-container-low p-4">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium">{factor.name}</span>
+              <div className="flex justify-between items-start gap-2 mb-3">
+                <div>
+                  <span className="text-sm font-medium">{factor.name}</span>
+                  <p className="text-[11px] text-on-surface-variant mt-1">{factor.impact}</p>
+                </div>
                 <span className="rounded-lg px-2 py-0.5 text-[11px] font-semibold bg-secondary-container/20 text-secondary">{factor.percentage}%</span>
               </div>
+
+              <div className="h-1.5 bg-surface-container-highest rounded-full overflow-hidden mb-3">
+                <div className="h-full rounded-full" style={{ width: `${factor.percentage * 2.4}%`, backgroundColor: factor.color }}></div>
+              </div>
+
               <div style={{ height: '56px' }}>
                 <Line data={chartData} options={chartOptions} />
               </div>
