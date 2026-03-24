@@ -38,6 +38,7 @@
 
         .ghost-border {
                 border: 1px solid rgba(255, 255, 255, 0.05); /* Same as border-white/5 */
+        }
 
 	.ai-pulse {
 		position: relative;
