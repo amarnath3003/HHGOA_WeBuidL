@@ -1,27 +1,56 @@
 import React from 'react';
 
-const WalletSummary = () => {
-  const balance = '$12,450.00';
-  const ensName = 'etherean.eth';
+const fallbackSummary = {
+  usdt_balance_display: '$0.00',
+  ens_name: 'No ENS set',
+  nft_count: 0,
+  transaction_count: 0,
+  account_age_display: '0 days',
+  network_diversity: 0,
+};
 
-  const nfts = [
+const fallbackCollections = [
+  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: '#a6e6ff' },
+  { name: 'Signal Archive', tier: 'Growth', estimated_value_display: '$0.00', accent: '#cdbdff' },
+  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: '#14d1ff' },
+];
+
+const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallbackCollections }) => {
+  const walletSummary = summary || fallbackSummary;
+  const collections = Array.isArray(featuredCollections) && featuredCollections.length > 0 ? featuredCollections : fallbackCollections;
+
+  const stats = [
     {
-      id: 1,
-      name: 'Ethereal Void #42',
-      thumbnail: 'https://i.seadn.io/gae/qoR1cWuIZzjlrNVcSMAzhrwDvXNtMxaYuDbNqkc_J5WGGqMSrF0wzO7K2MnSCEBLG8G8pZyJPqV7eTGt4wGwret85sbXJBYoAkypdQ?auto=format&dpr=1&w=1000',
-      lastSale: '90 ETH'
+      title: 'USDT Balance',
+      value: walletSummary.usdt_balance_display,
+      subtitle: 'Tether USD',
+      icon: 'currency_exchange',
+      color: 'text-tertiary',
+      background: 'bg-tertiary-container/30',
     },
     {
-      id: 2,
-      name: 'Crystal Node #109',
-      thumbnail: 'https://i.seadn.io/gae/zhBAmEH_zYzNsK2HRaD_qWV43fBz8B5urR0qxy0rjpy5lGSMz1AU_sLyRxttBuMPt76FkF8k4xqg7NGGRDCps52M3ss_0dxoSUKT?auto=format&dpr=1&w=1000',
-      lastSale: '60 ETH'
+      title: 'ENS Identity',
+      value: walletSummary.ens_name || 'No ENS set',
+      subtitle: 'Wallet naming',
+      icon: 'alternate_email',
+      color: 'text-tertiary',
+      background: 'bg-tertiary-container/20',
     },
     {
-      id: 3,
-      name: 'Pulse Wave #01',
-      thumbnail: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDW_F5Nl2zAVt1ZHB7jfreqiMHzVGzNZ9-M4IEAGubT_4w-RQeA95tJZ5Y-xfh7hFHTZ72C1yr74Qh42HwOSxixgK_yFMeALN_UJPTRLita_oUuyzokNP-awL2L-220y2LCCeIq_tJ893U1ixubjTlG5Z0uAtRHeW0S9WEi-gcbWuEypEJHGMfVw7FhCkNscMtkNYyexfM9g4VRfFz5SWIQge4LW-A688FmfeG3xKU5GuePvYNfK2o1OWG4LSzRFhl_D6KKpnhL-tXu',
-      lastSale: '42 ETH'
+      title: 'Transaction Count',
+      value: `${walletSummary.transaction_count ?? 0}`,
+      subtitle: walletSummary.account_age_display || 'Account activity',
+      icon: 'history',
+      color: 'text-primary',
+      background: 'bg-primary/15',
+    },
+    {
+      title: 'Network Diversity',
+      value: `${walletSummary.network_diversity ?? 0} chains`,
+      subtitle: `${walletSummary.nft_count ?? 0} NFTs tracked`,
+      icon: 'lan',
+      color: 'text-[#a6e6ff]',
+      background: 'bg-[#a6e6ff]/10',
     },
   ];
 
@@ -30,54 +59,53 @@ const WalletSummary = () => {
       <div className="space-y-4">
         <div className="flex justify-between items-end">
           <h2 className="text-base font-bold tracking-tight uppercase">On-Chain Assets</h2>
-          <span className="text-[11px] font-mono text-tertiary/70 uppercase tracking-wider">Verified by Nada</span>
+          <span className="text-[11px] font-mono text-tertiary/70 uppercase tracking-wider">Verified by Backend</span>
         </div>
 
         <div className="space-y-3">
-          <article className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <span className="material-symbols-outlined text-tertiary">currency_exchange</span>
+          {stats.map((stat) => (
+            <article key={stat.title} className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`w-10 h-10 rounded-full ${stat.background} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                  <span className={`material-symbols-outlined ${stat.color}`}>{stat.icon}</span>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">{stat.title}</div>
+                  <div className="text-xs font-mono text-on-surface-variant truncate">{stat.subtitle}</div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">USDT Balance</div>
-                <div className="text-xs font-mono text-on-surface-variant">Tether USD</div>
+              <div className="text-right shrink-0">
+                <div className={`text-sm md:text-base font-mono font-bold ${stat.color}`}>{stat.value}</div>
               </div>
-            </div>
-            <div className="text-right shrink-0">
-              <div className="text-sm md:text-base font-mono font-bold text-tertiary">$12,450.00</div>
-              <div className="text-xs text-on-surface-variant">ERC-20</div>
-            </div>
-          </article>
-
-          <article className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <span className="material-symbols-outlined text-tertiary">alternate_email</span>
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">ENS Identity</div>
-                <div className="text-xs font-mono text-on-surface-variant truncate">etherean.eth</div>
-              </div>
-            </div>
-            <span className="material-symbols-outlined text-on-surface-variant text-sm group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300">open_in_new</span>
-          </article>
+            </article>
+          ))}
         </div>
       </div>
 
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-base font-bold tracking-tight uppercase">Collections</h2>
-          <span className="text-[11px] font-mono text-on-surface-variant">{nfts.length} Assets</span>
+          <span className="text-[11px] font-mono text-on-surface-variant">{walletSummary.nft_count ?? 0} Assets</span>
         </div>
 
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-2">
-          {nfts.map((nft) => (
-            <article key={nft.id} className="flex-shrink-0 w-40 group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
-              <div className="aspect-square rounded-xl overflow-hidden bg-surface-container-highest mb-2 shadow-sm group-hover:shadow-lg group-hover:shadow-tertiary-fixed-dim/20 transition-all duration-300">
-                <img src={nft.thumbnail} alt={nft.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+          {collections.map((collection) => (
+            <article key={collection.name} className="flex-shrink-0 w-40 group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
+              <div
+                className="aspect-square rounded-xl mb-2 shadow-sm group-hover:shadow-lg transition-all duration-300 flex flex-col justify-between p-4 border border-white/10"
+                style={{
+                  background: `linear-gradient(160deg, ${collection.accent}33, rgba(19, 19, 19, 0.95))`,
+                  boxShadow: `0 20px 40px -24px ${collection.accent}`,
+                }}
+              >
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/65">{collection.tier}</span>
+                <div>
+                  <div className="text-xl font-black text-white/90">{collection.name.slice(0, 2).toUpperCase()}</div>
+                  <div className="text-xs text-white/50 mt-1">Estimated</div>
+                </div>
               </div>
-              <div className="text-xs font-bold truncate group-hover:text-tertiary-fixed-dim transition-colors">{nft.name}</div>
+              <div className="text-xs font-bold truncate group-hover:text-tertiary-fixed-dim transition-colors">{collection.name}</div>
+              <div className="text-[11px] font-mono text-on-surface-variant mt-1">{collection.estimated_value_display}</div>
             </article>
           ))}
         </div>

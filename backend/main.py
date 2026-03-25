@@ -58,6 +58,9 @@ class EtherScoreAPIHandler(BaseHTTPRequestHandler):
             return
 
         payload = self._read_json_body()
+        if payload is None:
+            return
+
         address = str(payload.get("address", "")).strip()
         self._handle_score_request(address)
 
@@ -77,7 +80,7 @@ class EtherScoreAPIHandler(BaseHTTPRequestHandler):
 
         self._send_json(HTTPStatus.OK, result)
 
-    def _read_json_body(self) -> dict[str, object]:
+    def _read_json_body(self) -> dict[str, object] | None:
         content_length = int(self.headers.get("Content-Length", "0"))
         if content_length <= 0:
             return {}
@@ -90,7 +93,7 @@ class EtherScoreAPIHandler(BaseHTTPRequestHandler):
             return json.loads(raw_body.decode("utf-8"))
         except json.JSONDecodeError:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Request body must be valid JSON."})
-            return {}
+            return None
 
     def _send_json(self, status: HTTPStatus, payload: dict[str, object]) -> None:
         body = b"" if status == HTTPStatus.NO_CONTENT else json.dumps(payload).encode("utf-8")
