@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import csv
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import hashlib
 import json
-import math
 import os
+from pathlib import Path
 import re
 import time
 from typing import Any, Sequence
@@ -96,6 +97,47 @@ class ScoreBuildResult:
     chains_requested: list[str]
     chains_used: list[str]
     warnings: list[str]
+
+
+MODEL_FEATURE_COLUMNS: tuple[str, ...] = (
+    "wallet_balance_usd",
+    "transaction_count",
+    "nft_ownership_volume",
+    "account_age_days",
+    "token_diversity",
+)
+MODEL_TARGET_COLUMN = "credit_score"
+MODEL_PRIOR_WEIGHTS: dict[str, float] = {
+    "wallet_balance_usd": 0.40,
+    "transaction_count": 0.20,
+    "nft_ownership_volume": 0.15,
+    "account_age_days": 0.15,
+    "token_diversity": 0.10,
+}
+MODEL_FALLBACK_MIN_MAX: dict[str, tuple[float, float]] = {
+    "wallet_balance_usd": (50.0, 150000.0),
+    "transaction_count": (1.0, 5000.0),
+    "nft_ownership_volume": (0.0, 200.0),
+    "account_age_days": (30.0, 3650.0),
+    "token_diversity": (1.0, 30.0),
+}
+MODEL_FALLBACK_SCALE = 506.9106
+MODEL_FALLBACK_INTERCEPT = 411.9560
+MODEL_FACTOR_TO_FEATURE = {
+    "Wallet Balance": "wallet_balance_usd",
+    "Transaction History": "transaction_count",
+    "NFT Holdings": "nft_ownership_volume",
+    "Account Age": "account_age_days",
+    "Network Diversity": "token_diversity",
+}
+
+
+@dataclass(frozen=True)
+class WeightedCreditModel:
+    weights: dict[str, float]
+    min_max_stats: dict[str, tuple[float, float]]
+    scale: float
+    intercept: float
 
 
 FACTOR_DEFINITIONS: tuple[FactorDefinition, ...] = (
@@ -193,6 +235,7 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
 
 _payload_cache: dict[str, tuple[float, ScoreBuildResult]] = {}
 _price_cache: tuple[datetime, dict[str, float]] | None = None
+_credit_model: WeightedCreditModel | None = None
 
 
 def _clamp(value: float, minimum: float, maximum: float) -> float:
