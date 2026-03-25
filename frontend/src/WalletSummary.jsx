@@ -10,9 +10,9 @@ const fallbackSummary = {
 };
 
 const fallbackCollections = [
-  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: 'secondary' },
-  { name: 'Signal Archive', tier: 'Growth', estimated_value_display: '$0.00', accent: 'tertiary' },
-  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: 'primary' },
+  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: '#a6e6ff' },
+  { name: 'Signal Archive', tier: 'Growth', estimated_value_display: '$0.00', accent: '#cdbdff' },
+  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: '#b1c5ff' },
 ];
 
 const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallbackCollections }) => {
@@ -26,7 +26,7 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
       subtitle: 'Tether USD',
       icon: 'currency_exchange',
       color: 'text-tertiary',
-      chip: 'bg-tertiary/10',
+      background: 'bg-tertiary-container/30',
     },
     {
       title: 'ENS Identity',
@@ -34,7 +34,7 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
       subtitle: 'Wallet naming',
       icon: 'alternate_email',
       color: 'text-tertiary',
-      chip: 'bg-tertiary/10',
+      background: 'bg-tertiary-container/20',
     },
     {
       title: 'Transaction Count',
@@ -42,7 +42,7 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
       subtitle: walletSummary.account_age_display || 'Account activity',
       icon: 'history',
       color: 'text-primary',
-      chip: 'bg-primary/10',
+      background: 'bg-primary/15',
     },
     {
       title: 'Network Diversity',
@@ -50,62 +50,61 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
       subtitle: `${walletSummary.nft_count ?? 0} NFTs tracked`,
       icon: 'lan',
       color: 'text-secondary',
-      chip: 'bg-secondary/10',
+      background: 'bg-secondary/10',
     },
   ];
 
-  const getCollectionAccent = (accent) => {
-    if (accent === 'secondary') return 'bg-secondary/40';
-    if (accent === 'tertiary') return 'bg-tertiary/40';
-    return 'bg-primary/40';
-  };
-
   return (
     <section className="space-y-8">
-      <div className="space-y-4 tonal-panel glass-panel ghost-outline p-5">
+      <div className="space-y-4">
         <div className="flex justify-between items-end">
-          <h2 className="text-base font-semibold tracking-tight uppercase">On-Chain Assets</h2>
-          <span className="section-kicker">Verified by Backend</span>
+          <h2 className="text-base font-bold tracking-tight uppercase">On-Chain Assets</h2>
+          <span className="text-[11px] font-mono text-tertiary/70 uppercase tracking-wider">Verified by Backend</span>
         </div>
 
         <div className="space-y-3">
           {stats.map((stat) => (
-            <article key={stat.title} className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors duration-300 gap-3">
+            <article key={stat.title} className="group flex items-center justify-between p-4 rounded-xl bg-surface-container-low ghost-border hover:bg-surface-container-high transition-all duration-300 hover:-translate-y-1 hover:shadow-lg gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-10 h-10 rounded-lg ${stat.chip} flex items-center justify-center`}>
+                <div className={`w-10 h-10 rounded-full ${stat.background} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                   <span className={`material-symbols-outlined ${stat.color}`}>{stat.icon}</span>
                 </div>
                 <div className="min-w-0">
-                  <div className="text-sm font-semibold">{stat.title}</div>
+                  <div className="text-sm font-semibold group-hover:text-tertiary-fixed-dim transition-colors">{stat.title}</div>
                   <div className="text-xs font-mono text-on-surface-variant truncate">{stat.subtitle}</div>
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className={`text-sm md:text-base font-mono font-semibold ${stat.color}`}>{stat.value}</div>
+                <div className={`text-sm md:text-base font-mono font-bold ${stat.color}`}>{stat.value}</div>
               </div>
             </article>
           ))}
         </div>
       </div>
 
-      <div className="space-y-4 tonal-panel glass-panel ghost-outline p-5">
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-base font-semibold tracking-tight uppercase">Collections</h2>
+          <h2 className="text-base font-bold tracking-tight uppercase">Collections</h2>
           <span className="text-[11px] font-mono text-on-surface-variant">{walletSummary.nft_count ?? 0} Assets</span>
         </div>
 
         <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-2">
           {collections.map((collection) => (
-            <article key={collection.name} className="flex-shrink-0 w-40 group cursor-pointer">
-              <div className="aspect-square rounded-xl mb-2 transition-colors duration-300 flex flex-col justify-between p-4 bg-surface-container-low group-hover:bg-surface-container-high">
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">{collection.tier}</span>
+            <article key={collection.name} className="flex-shrink-0 w-40 group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
+              <div
+                className="aspect-square rounded-xl mb-2 shadow-sm group-hover:shadow-lg transition-all duration-300 flex flex-col justify-between p-4 border border-white/10"
+                style={{
+                  background: `linear-gradient(160deg, ${collection.accent}33, rgba(19, 19, 19, 0.95))`,
+                  boxShadow: `0 20px 40px -24px ${collection.accent}`,
+                }}
+              >
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/65">{collection.tier}</span>
                 <div>
-                  <div className={`w-8 h-1 rounded-full mb-2 ${getCollectionAccent(collection.accent)}`}></div>
-                  <div className="text-xl font-black text-on-surface">{collection.name.slice(0, 2).toUpperCase()}</div>
-                  <div className="text-xs text-on-surface-variant mt-1">Estimated</div>
+                  <div className="text-xl font-black text-white/90">{collection.name.slice(0, 2).toUpperCase()}</div>
+                  <div className="text-xs text-white/50 mt-1">Estimated</div>
                 </div>
               </div>
-              <div className="text-xs font-bold truncate">{collection.name}</div>
+              <div className="text-xs font-bold truncate group-hover:text-tertiary-fixed-dim transition-colors">{collection.name}</div>
               <div className="text-[11px] font-mono text-on-surface-variant mt-1">{collection.estimated_value_display}</div>
             </article>
           ))}
