@@ -682,22 +682,21 @@ def _get_native_prices_usd() -> dict[str, float]:
         if (now - cached_at).total_seconds() < PRICE_CACHE_TTL_SECONDS:
             return dict(cached_prices)
 
-    fallbacks = {
-        "ethereum": ETH_FALLBACK_PRICE_USD,
-        "polygon": MATIC_FALLBACK_PRICE_USD,
-        "bsc": BNB_FALLBACK_PRICE_USD,
-        "arbitrum": ETH_FALLBACK_PRICE_USD,
-    }
-
-    prices = dict(fallbacks)
+    prices: dict[str, float] = {}
     try:
         payload = _request_json(ETH_PRICE_API_URL, retries=0)
         for chain_name, spec in CHAIN_SPECS.items():
             raw_price = payload.get(spec.price_key, {}).get("usd") if isinstance(payload.get(spec.price_key), dict) else None
-            parsed_price = _safe_float(raw_price, default=fallbacks[chain_name])
-            prices[chain_name] = parsed_price if parsed_price > 0 else fallbacks[chain_name]
+            parsed_price = _safe_float(raw_price, default=0.0)
+            if parsed_price <= 0:
+                raise ExternalServiceError(
+                    f"Price feed missing/invalid USD value for chain '{chain_name}' from {ETH_PRICE_API_URL}."
+                )
+            prices[chain_name] = parsed_price
     except ExternalServiceError:
-        prices = fallbacks
+        raise
+    except Exception as exc:
+        raise ExternalServiceError(f"Failed to fetch USD prices from {ETH_PRICE_API_URL}.") from exc
 
     _price_cache = (now, dict(prices))
     return prices
