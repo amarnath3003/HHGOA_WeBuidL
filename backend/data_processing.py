@@ -123,15 +123,6 @@ MODEL_FALLBACK_MIN_MAX: dict[str, tuple[float, float]] = {
 }
 MODEL_FALLBACK_SCALE = 506.9106
 MODEL_FALLBACK_INTERCEPT = 411.9560
-MODEL_FACTOR_TO_FEATURE = {
-    "Wallet Balance": "wallet_balance_usd",
-    "Transaction History": "transaction_count",
-    "NFT Holdings": "nft_ownership_volume",
-    "Account Age": "account_age_days",
-    "Network Diversity": "token_diversity",
-}
-
-
 @dataclass(frozen=True)
 class WeightedCreditModel:
     weights: dict[str, float]
@@ -1150,29 +1141,50 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
     account_age_days = min(account_age_candidates) if account_age_candidates else None
     account_age_for_model = float(account_age_days if account_age_days is not None else 365)
     total_assets_usd = total_native_usd + total_usdt
-    network_signal = active_chain_count + math.log1p(max(total_token_diversity, 0))
+    model_features = {
+        "wallet_balance_usd": float(total_assets_usd),
+        "transaction_count": float(total_transactions),
+        "nft_ownership_volume": float(total_nfts),
+        "account_age_days": float(account_age_for_model),
+        "token_diversity": float(total_token_diversity),
+    }
+    model = _get_credit_model()
+    score = _predict_credit_score(model_features, model)
 
     normalized_factors = {
-        "Wallet Balance": _clamp(math.log1p(total_assets_usd) / math.log1p(750000.0), 0.0, 1.0),
-        "Transaction History": _clamp(math.log1p(total_transactions) / math.log1p(50000.0), 0.0, 1.0),
-        "NFT Holdings": _clamp(math.log1p(total_nfts) / math.log1p(1500.0), 0.0, 1.0),
-        "Account Age": _clamp(account_age_for_model / 3650.0, 0.0, 1.0),
-        "Network Diversity": _clamp(network_signal / 6.0, 0.0, 1.0),
+        "Wallet Balance": _normalize_model_feature(
+            model_features["wallet_balance_usd"],
+            model.min_max_stats["wallet_balance_usd"][0],
+            model.min_max_stats["wallet_balance_usd"][1],
+        ),
+        "Transaction History": _normalize_model_feature(
+            model_features["transaction_count"],
+            model.min_max_stats["transaction_count"][0],
+            model.min_max_stats["transaction_count"][1],
+        ),
+        "NFT Holdings": _normalize_model_feature(
+            model_features["nft_ownership_volume"],
+            model.min_max_stats["nft_ownership_volume"][0],
+            model.min_max_stats["nft_ownership_volume"][1],
+        ),
+        "Account Age": _normalize_model_feature(
+            model_features["account_age_days"],
+            model.min_max_stats["account_age_days"][0],
+            model.min_max_stats["account_age_days"][1],
+        ),
+        "Network Diversity": _normalize_model_feature(
+            model_features["token_diversity"],
+            model.min_max_stats["token_diversity"][0],
+            model.min_max_stats["token_diversity"][1],
+        ),
     }
-
-    weighted_total = sum(
-        normalized_factors[factor.name] * (factor.weight / 100.0)
-        for factor in FACTOR_DEFINITIONS
-    )
-    score = int(round(300 + weighted_total * 550))
-    score = int(_clamp(score, 300, 850))
 
     factor_raw_values = {
         "Wallet Balance": total_assets_usd,
         "Transaction History": float(total_transactions),
         "NFT Holdings": float(total_nfts),
         "Account Age": account_age_for_model,
-        "Network Diversity": float(active_chain_count),
+        "Network Diversity": float(total_token_diversity),
     }
 
     factors: list[dict[str, Any]] = []
