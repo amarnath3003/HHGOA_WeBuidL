@@ -3,8 +3,7 @@ from __future__ import annotations
 import csv
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-import hashlib
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -17,8 +16,6 @@ from urllib.request import Request, urlopen
 
 
 ETH_ADDRESS_PATTERN = re.compile(r"^0x[a-fA-F0-9]{40}$")
-AVERAGE_SCORE = 720
-COLLECTION_TIERS = ("Blue Chip", "Growth", "Emerging")
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 
 REQUEST_TIMEOUT_SECONDS = float(os.getenv("ETHERSCORE_REQUEST_TIMEOUT_SECONDS", "10"))
@@ -27,14 +24,6 @@ PAYLOAD_CACHE_TTL_SECONDS = float(os.getenv("ETHERSCORE_CACHE_TTL_SECONDS", "120
 PRICE_CACHE_TTL_SECONDS = float(os.getenv("ETHERSCORE_PRICE_CACHE_TTL_SECONDS", "900"))
 HTTP_USER_AGENT = os.getenv("ETHERSCORE_HTTP_USER_AGENT", "EtherScoreBackend/3.0 (+local)")
 
-ETH_FALLBACK_PRICE_USD = float(os.getenv("ETHERSCORE_FALLBACK_ETH_USD", "3000"))
-MATIC_FALLBACK_PRICE_USD = float(os.getenv("ETHERSCORE_FALLBACK_MATIC_USD", "0.9"))
-BNB_FALLBACK_PRICE_USD = float(os.getenv("ETHERSCORE_FALLBACK_BNB_USD", "500"))
-NFT_FALLBACK_FLOOR_USD = float(os.getenv("ETHERSCORE_FALLBACK_NFT_FLOOR_USD", "120"))
-
-DEFAULT_ETH_INFURA_RPC = "https://mainnet.infura.io/v3/84842078b09946638c03157f83405213"
-DEFAULT_ETH_ALCHEMY_RPC = "https://eth-mainnet.g.alchemy.com/v2/demo"
-DEFAULT_ETH_NFT_API = "https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner"
 ETH_PRICE_API_URL = os.getenv(
     "ETHERSCORE_ETH_PRICE_API_URL",
     "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,matic-network,binancecoin&vs_currencies=usd",
@@ -64,13 +53,10 @@ class ChainSpec:
     rpc_env_var: str
     native_symbol: str
     price_key: str
-    fallback_price_usd: float
     usdt_contract: str
     usdt_decimals: int = 6
     legacy_rpc_env_var: str | None = None
-    default_rpc_candidates: tuple[str, ...] = ()
     nft_env_var: str | None = None
-    default_nft_endpoint: str | None = None
     supports_ens: bool = False
     supports_etherscan_age: bool = False
 
@@ -114,21 +100,14 @@ MODEL_PRIOR_WEIGHTS: dict[str, float] = {
     "account_age_days": 0.15,
     "token_diversity": 0.10,
 }
-MODEL_FALLBACK_MIN_MAX: dict[str, tuple[float, float]] = {
-    "wallet_balance_usd": (50.0, 150000.0),
-    "transaction_count": (1.0, 5000.0),
-    "nft_ownership_volume": (0.0, 200.0),
-    "account_age_days": (30.0, 3650.0),
-    "token_diversity": (1.0, 30.0),
-}
-MODEL_FALLBACK_SCALE = 506.9106
-MODEL_FALLBACK_INTERCEPT = 411.9560
 @dataclass(frozen=True)
 class WeightedCreditModel:
     weights: dict[str, float]
     min_max_stats: dict[str, tuple[float, float]]
     scale: float
     intercept: float
+    average_score: int
+    reference_scores: tuple[float, ...]
 
 
 FACTOR_DEFINITIONS: tuple[FactorDefinition, ...] = (
@@ -186,12 +165,9 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         rpc_env_var="ETHERSCORE_RPC_URL_ETHEREUM",
         native_symbol="ETH",
         price_key="ethereum",
-        fallback_price_usd=ETH_FALLBACK_PRICE_USD,
         usdt_contract="0xdAC17F958D2ee523a2206206994597C13D831ec7",
         legacy_rpc_env_var="ETHERSCORE_RPC_URL",
-        default_rpc_candidates=(DEFAULT_ETH_INFURA_RPC, DEFAULT_ETH_ALCHEMY_RPC),
         nft_env_var="ETHERSCORE_NFT_API_URL_ETHEREUM",
-        default_nft_endpoint=DEFAULT_ETH_NFT_API,
         supports_ens=True,
         supports_etherscan_age=True,
     ),
@@ -200,7 +176,6 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         rpc_env_var="ETHERSCORE_RPC_URL_POLYGON",
         native_symbol="MATIC",
         price_key="matic-network",
-        fallback_price_usd=MATIC_FALLBACK_PRICE_USD,
         usdt_contract="0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         nft_env_var="ETHERSCORE_NFT_API_URL_POLYGON",
     ),
@@ -209,7 +184,6 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         rpc_env_var="ETHERSCORE_RPC_URL_BSC",
         native_symbol="BNB",
         price_key="binancecoin",
-        fallback_price_usd=BNB_FALLBACK_PRICE_USD,
         usdt_contract="0x55d398326f99059fF775485246999027B3197955",
         nft_env_var="ETHERSCORE_NFT_API_URL_BSC",
     ),
@@ -218,7 +192,6 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         rpc_env_var="ETHERSCORE_RPC_URL_ARBITRUM",
         native_symbol="ETH",
         price_key="ethereum",
-        fallback_price_usd=ETH_FALLBACK_PRICE_USD,
         usdt_contract="0xFd086bC7CD5C481DCC9C85ebe478A1C0b69FCbb9",
         nft_env_var="ETHERSCORE_NFT_API_URL_ARBITRUM",
     ),
@@ -301,15 +274,6 @@ def _weighted_model_index(
     )
 
 
-def _fallback_credit_model() -> WeightedCreditModel:
-    return WeightedCreditModel(
-        weights=dict(MODEL_PRIOR_WEIGHTS),
-        min_max_stats=dict(MODEL_FALLBACK_MIN_MAX),
-        scale=MODEL_FALLBACK_SCALE,
-        intercept=MODEL_FALLBACK_INTERCEPT,
-    )
-
-
 def _feature_min_max(rows: list[dict[str, float]]) -> dict[str, tuple[float, float]]:
     stats: dict[str, tuple[float, float]] = {}
     for column in MODEL_FEATURE_COLUMNS:
@@ -336,6 +300,8 @@ def _train_weighted_credit_model(rows: list[dict[str, float]]) -> WeightedCredit
         min_max_stats=min_max_stats,
         scale=scale,
         intercept=intercept,
+        average_score=int(round(mean_y)),
+        reference_scores=tuple(sorted(y)),
     )
 
 
@@ -376,10 +342,12 @@ def _get_credit_model() -> WeightedCreditModel:
 
     dataset_path = _model_dataset_path()
     rows = _load_model_rows(dataset_path)
-    if rows:
-        _credit_model = _train_weighted_credit_model(rows)
-    else:
-        _credit_model = _fallback_credit_model()
+    if not rows:
+        raise ExternalServiceError(
+            f"Credit model dataset is missing or invalid at '{dataset_path}'. "
+            "Set ETHERSCORE_CREDIT_MODEL_DATASET_PATH to a valid CSV."
+        )
+    _credit_model = _train_weighted_credit_model(rows)
     return _credit_model
 
 
