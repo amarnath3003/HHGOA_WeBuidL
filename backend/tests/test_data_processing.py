@@ -11,6 +11,7 @@ ADDRESS = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
 def _reset_caches() -> None:
     dp._payload_cache.clear()
     dp._price_cache = None
+    dp._credit_model = None
 
 
 def _snapshot(chain: str) -> dp.ChainSnapshot:
@@ -102,3 +103,51 @@ def test_all_chain_fetches_failed_raise_runtime_error(monkeypatch: pytest.Monkey
 
     with pytest.raises(RuntimeError, match="Unable to fetch wallet metrics from requested chains"):
         dp.build_score_payload(ADDRESS, chains=["ethereum", "polygon"])
+
+
+def test_credit_score_uses_model_prediction(monkeypatch: pytest.MonkeyPatch) -> None:
+    _reset_caches()
+    monkeypatch.setattr(dp, "_rpc_candidates", lambda spec: [f"https://{spec.name}.rpc.local"])
+    monkeypatch.setattr(dp, "_fetch_chain_snapshot", lambda address, chain: _snapshot(chain))
+    monkeypatch.setattr(
+        dp,
+        "_get_native_prices_usd",
+        lambda: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
+    )
+
+    model = dp.WeightedCreditModel(
+        weights={
+            "wallet_balance_usd": 0.40,
+            "transaction_count": 0.20,
+            "nft_ownership_volume": 0.15,
+            "account_age_days": 0.15,
+            "token_diversity": 0.10,
+        },
+        min_max_stats={
+            "wallet_balance_usd": (0.0, 100000.0),
+            "transaction_count": (0.0, 5000.0),
+            "nft_ownership_volume": (0.0, 200.0),
+            "account_age_days": (0.0, 3650.0),
+            "token_diversity": (0.0, 30.0),
+        },
+        scale=500.0,
+        intercept=350.0,
+    )
+    captured_features: dict[str, float] = {}
+
+    def fake_predict(wallet_features: dict[str, float], loaded_model: dp.WeightedCreditModel) -> int:
+        captured_features.update(wallet_features)
+        assert loaded_model == model
+        return 612
+
+    monkeypatch.setattr(dp, "_get_credit_model", lambda: model)
+    monkeypatch.setattr(dp, "_predict_credit_score", fake_predict)
+
+    result = dp.build_score_payload(ADDRESS, chains=["ethereum"])
+
+    assert result.payload["score"] == 612
+    assert captured_features["wallet_balance_usd"] == pytest.approx(4250.0)
+    assert captured_features["transaction_count"] == pytest.approx(250.0)
+    assert captured_features["nft_ownership_volume"] == pytest.approx(12.0)
+    assert captured_features["account_age_days"] == pytest.approx(420.0)
+    assert captured_features["token_diversity"] == pytest.approx(6.0)
