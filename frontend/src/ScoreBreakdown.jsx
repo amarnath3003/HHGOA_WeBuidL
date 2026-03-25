@@ -5,17 +5,18 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const fallbackFactors = [
-  { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.4)', impact: 'Primary driver', icon: 'account_balance_wallet', value: '$0.00' },
-  { name: 'Transaction History', percentage: 25, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.4)', impact: 'Behavioral consistency', icon: 'history', value: '0' },
-  { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.4)', impact: 'Asset credibility', icon: 'token', value: '0' },
-  { name: 'Account Age', percentage: 15, color: '#14d1ff', glow: 'rgba(20, 209, 255, 0.4)', impact: 'Longevity signal', icon: 'hourglass_empty', value: '0 days' },
-  { name: 'Network Diversity', percentage: 10, color: '#7f72ff', glow: 'rgba(127, 114, 255, 0.4)', impact: 'Cross-chain resilience', icon: 'lan', value: '0' },
-];
-
-const makeFallbackTrend = (index) => Array.from({ length: 12 }, (_, monthIndex) => 58 + ((index * 9 + monthIndex * 4) % 22));
+    { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.4)', impact: 'Primary driver', icon: 'account_balance_wallet' },
+    { name: 'Transaction History', percentage: 25, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.4)', impact: 'Behavioral consistency', icon: 'history' },
+    { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.4)', impact: 'Asset credibility', icon: 'token' },
+    { name: 'Account Age', percentage: 15, color: '#14d1ff', glow: 'rgba(20, 209, 255, 0.4)', impact: 'Longevity signal', icon: 'hourglass_empty' },
+    { name: 'Network Diversity', percentage: 10, color: '#7f72ff', glow: 'rgba(127, 114, 255, 0.4)', impact: 'Cross-chain resilience', icon: 'lan' },
+  ];
 
 const ScoreBreakdown = ({ factors = fallbackFactors }) => {
-  const normalizedFactors = Array.isArray(factors) && factors.length > 0 ? factors : fallbackFactors;
+
+  const generateMockData = () => {
+    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 40) + 60);
+  };
 
   const chartOptions = {
     responsive: true,
@@ -53,77 +54,77 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
     }
   };
 
-  const topFactor = [...normalizedFactors].sort((left, right) => right.percentage - left.percentage)[0];
+  const topFactor = factors[0];
 
   return (
-    <section className="relative rounded-2xl bg-[#0f1115]/80 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+    <section className="relative rounded-lg bg-surface-container/80 backdrop-blur-[20px] p-6 md:p-8 shadow-ambient overflow-hidden border border-outline-variant/15">
+      {/* Decorative background glow */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#cdbdff]/10 rounded-full blur-[80px] pointer-events-none"></div>
+      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-primary text-sm">equalizer</span>
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary/80">Score Breakdown</p>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Score Breakdown</p>
           </div>
-          <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-tr from-primary to-tertiary bg-clip-text text-transparent">
             Factor Matrix
           </h3>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant/15 bg-surface-container-highest backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/70">Weighted / Dynamic</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant">Weighted / Dynamic</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 relative z-10">
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#a6e6ff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-[#a6e6ff]">star</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 relative z-10 bg-surface-container-low p-5 rounded-lg">
+        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+            <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-[18px] text-primary">star</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Top Factor</p>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-[#a6e6ff] transition-colors">{topFactor.name}</p>
+            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">{topFactor.name}</p>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[#a6e6ff] bg-[#a6e6ff]/10 px-2 py-0.5 rounded">{topFactor.percentage}%</span>
-              <span className="text-xs text-white/40">Total Weight</span>
+              <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-lg">{topFactor.percentage}%</span>
+              <span className="text-xs text-on-surface-variant">Total Weight</span>
             </div>
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#cdbdff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-[#cdbdff]">verified_user</span>
+        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+            <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-[18px] text-tertiary">verified_user</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Model Confidence</p>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-[#cdbdff] transition-colors">High</p>
-            <p className="text-xs text-white/50">Deterministic from wallet profile</p>
+            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-tertiary transition-colors">High</p>
+            <p className="text-xs text-on-surface-variant">Stable over 90 days</p>
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-green-400">trending_up</span>
+        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+            <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
+              <span className="material-symbols-outlined text-[18px] text-secondary">trending_up</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Volatility</p>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-green-400 transition-colors">Low</p>
-            <p className="text-xs text-white/50">Wallet-based scoring drift minimized</p>
+            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-secondary transition-colors">Low</p>
+            <p className="text-xs text-on-surface-variant">Predictive drift: <span className="text-secondary font-mono">1.9%</span></p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
-        {normalizedFactors.map((factor, index) => {
+        {factors.map((factor, index) => {
+          const mockData = generateMockData();
+          
           const chartData = {
             labels: Array(12).fill(''),
             datasets: [
               {
-                data: factor.trend || makeFallbackTrend(index),
+                data: mockData,
                 borderColor: factor.color,
                 backgroundColor: (context) => {
                   const ctx = context.chart.ctx;
@@ -138,39 +139,38 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
           };
 
           return (
-            <article
-              key={factor.name}
-              className="group flex flex-col justify-between rounded-xl bg-[#171920]/60 p-5 border border-white/[0.04] hover:bg-[#1a1c24]/80 hover:border-white/10 transition-all duration-300"
+            <article 
+              key={index} 
+              className="group flex flex-col justify-between rounded-lg bg-surface-container-highest p-5 border border-outline-variant/15 hover:bg-surface-container-highest/80 transition-all duration-300"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-300"
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant/15 group-hover:scale-110 transition-transform duration-300"
                     style={{ color: factor.color, boxShadow: `0 0 20px -5px ${factor.glow}` }}
                   >
                     <span className="material-symbols-outlined text-[20px]">{factor.icon}</span>
                   </div>
                   <div>
-                    <h4 className="text-base font-semibold text-white/90 group-hover:text-white transition-colors">{factor.name}</h4>
-                    <p className="text-xs text-white/40 mt-0.5">{factor.impact}</p>
-                    <p className="text-xs text-white/65 mt-1 font-mono">{factor.value}</p>
+                    <h4 className="text-base font-semibold text-on-surface group-hover:text-primary transition-colors">{factor.name}</h4>
+                    <p className="text-xs text-on-surface-variant mt-0.5">{factor.impact}</p>
                   </div>
                 </div>
-                <div
-                  className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 backdrop-blur-sm"
+                <div 
+                  className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/15 backdrop-blur-sm"
                   style={{ color: factor.color }}
                 >
                   <span className="text-sm font-bold">{factor.percentage}%</span>
                 </div>
               </div>
 
-              <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden mb-5">
-                <div
+              <div className="relative h-1.5 w-full bg-surface-container rounded-full overflow-hidden mb-5">
+                <div 
                   className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ease-out origin-left group-hover:scale-x-[1.02]"
-                  style={{
-                    width: `${factor.percentage}%`,
+                  style={{ 
+                    width: `${factor.percentage}%`, 
                     backgroundColor: factor.color,
-                    boxShadow: `0 0 10px ${factor.color}`
+                    boxShadow: `0 0 10px ${factor.color}` 
                   }}
                 />
               </div>

@@ -104,27 +104,27 @@ const CreditScoreSpeedometer = ({ score }) => {
           />
         </svg>
 
-        <div className="absolute flex flex-col items-center justify-center bg-surface-container-highest/90 backdrop-blur-xl rounded-full w-56 h-56 sm:w-64 sm:h-64 border border-outline-variant/15 shadow-lg z-20 overflow-hidden transition-all duration-700 group-hover:border-outline-variant/30 group-hover:shadow-xl">
+        <div className="absolute flex flex-col items-center justify-center bg-surface-container-high/90 backdrop-blur-xl rounded-full w-56 h-56 sm:w-64 sm:h-64 border border-outline-variant/15 shadow-lg z-20 overflow-hidden transition-all duration-700 group-hover:border-outline-variant/30 group-hover:shadow-xl">
           <div className="absolute -top-12 -right-6 w-32 h-32 bg-tertiary/20 rounded-full blur-3xl opacity-70"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-secondary/20 rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
           
           <div className="relative z-10 flex flex-col items-center mt-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <span className={`w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)] ${band.colorClass}`}></span>
+              <span className="w-2 h-2 rounded-full animate-pulse bg-tertiary shadow-[0_0_8px_rgba(205,189,255,0.8)]"></span>
               <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.25em] text-on-surface-variant uppercase">Credit Score</span>
             </div>
             
-            <div className={`text-7xl sm:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-primary to-tertiary drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] mb-2`}>
+            <div className="text-7xl sm:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-tr from-primary to-tertiary drop-shadow-[0_0_20px_rgba(177,197,255,0.2)] mb-2">
               {score}
             </div>
             
             <div className="flex items-center gap-2 mt-2">
                <span 
-                 className={`rounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container border border-outline-variant/15 backdrop-blur-sm ${band.colorClass}`}
+                 className={`rounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container-low border border-outline-variant/15 backdrop-blur-sm ${band.colorClass}`}
                >
                  {band.label}
                </span>
-               <span className="rounded-lg px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container border border-outline-variant/15 text-on-surface-variant">
+               <span className="rounded-lg px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container-low border border-outline-variant/15 text-on-surface-variant">
                  30d Live
                </span>
             </div>
