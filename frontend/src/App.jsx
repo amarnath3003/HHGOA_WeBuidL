@@ -80,43 +80,45 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#131313] text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#131313]/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
-        <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
-            <h1 className="text-xl font-bold tracking-tighter text-tertiary-fixed-dim">EtherScore</h1>
-          </div>
+    <div className="min-h-screen bg-background text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mt-4 max-w-7xl glass-panel ghost-outline rounded-xl shadow-ambient">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-5">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-tertiary-fixed-dim" style={{ fontVariationSettings: "'FILL' 1" }}>security</span>
+              <h1 className="text-xl font-semibold tracking-tight text-on-surface">EtherScore</h1>
+            </div>
 
-          <div className="flex items-center gap-3">
-            {!address ? (
-              <button
-                onClick={connectWallet}
-                className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-xs font-semibold hover:shadow-[0_8px_30px_rgba(0,81,195,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-sm">shield</span>
-                Connect
+            <div className="flex items-center gap-2 sm:gap-3">
+              {!address ? (
+                <button
+                  onClick={connectWallet}
+                  className="rounded-full px-4 py-2 bg-primary-container text-on-primary text-xs font-semibold hover:bg-inverse-primary hover:shadow-glow transition-all duration-300 flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-sm">shield</span>
+                  Connect
+                </button>
+              ) : (
+                <div className="rounded-full px-3 py-1.5 bg-surface-container-high ghost-outline flex items-center gap-2">
+                  <span className="material-symbols-outlined text-xs text-tertiary-fixed-dim" style={{ fontVariationSettings: "'FILL' 1" }}>account_balance_wallet</span>
+                  <span className="font-mono text-xs tracking-tight text-on-surface-variant">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+                </div>
+              )}
+
+              <button className="w-9 h-9 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high transition-colors" type="button" aria-label="Settings">
+                <span className="material-symbols-outlined text-base">settings</span>
               </button>
-            ) : (
-              <div className="flex items-center gap-2 bg-[#2a2a2a] px-3 py-1.5 rounded-full hover:bg-[#353535] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 group cursor-pointer">
-                <span className="material-symbols-outlined text-xs text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>account_balance_wallet</span>
-                <span className="font-mono text-xs tracking-tight text-on-surface-variant group-hover:text-white transition-colors">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
-              </div>
-            )}
-
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#2a2a2a] hover:-rotate-90 hover:scale-110 transition-all duration-500 active:scale-95 active:rotate-0" type="button" aria-label="Settings">
-              <span className="material-symbols-outlined text-on-surface-variant">settings</span>
-            </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
-        <div className="mx-auto w-full max-w-7xl space-y-8">
+      <main className="pt-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mx-auto w-full max-w-7xl space-y-14 md:space-y-20">
           <section className="flex justify-center">
-            <div className="flex items-center gap-2 px-4 py-1.5 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_15px_rgba(98,42,228,0.3)]">
-              <span className="material-symbols-outlined text-tertiary-fixed-dim text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
-              <span className="text-tertiary-fixed-dim text-[11px] sm:text-xs uppercase tracking-widest font-mono">Nada AI Protected</span>
+            <div className="glass-panel ghost-outline rounded-full px-4 py-1.5 flex items-center gap-2">
+              <span className="material-symbols-outlined text-tertiary-fixed-dim text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-on-surface-variant">Nada AI Protected</span>
             </div>
           </section>
 
@@ -125,53 +127,50 @@ function App() {
               <button
                 onClick={getCreditScore}
                 disabled={isLoadingScore}
-                className="relative overflow-hidden group w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-white transition-all text-background font-bold tracking-wide hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(177,197,255,0.4)] active:scale-95 active:translate-y-0 duration-300"
+                className={`w-full max-w-md rounded-full py-3 px-6 text-sm font-semibold tracking-wide transition-all duration-300 ${isLoadingScore ? 'shimmer-loading bg-surface-container-high text-on-surface' : 'bg-primary text-on-primary hover:bg-primary-fixed hover:-translate-y-0.5 hover:shadow-glow'}`}
               >
-                <div className="absolute inset-0 w-full h-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-                <span className="relative z-10">
-                  {isLoadingScore ? 'Calculating Score...' : creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
-                </span>
+                {isLoadingScore ? 'Calculating Score...' : creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
               </button>
             </section>
           )}
 
           {scoreError && (
             <section className="max-w-2xl mx-auto text-center">
-              <p className="rounded-xl border border-[#ffb4ab]/30 bg-[#ffb4ab]/10 px-4 py-3 text-sm text-[#ffb4ab]">{scoreError}</p>
+              <p className="rounded-xl px-4 py-3 text-sm text-error bg-error/10 ghost-outline">{scoreError}</p>
             </section>
           )}
 
           {!address && (
-            <section className="mt-10 max-w-2xl mx-auto text-center text-on-surface-variant">
+            <section className="max-w-2xl mx-auto text-center text-on-surface-variant">
               <p className="text-sm md:text-base">Connect your wallet to initialize privacy-preserving score computation and unlock your on-chain credit intelligence dashboard.</p>
             </section>
           )}
 
           {creditScore && (
             <>
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              <section className="opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
                 <CreditScoreSpeedometer score={creditScore} />
-              </div>
+              </section>
 
-              <section className="grid grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
-                  <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
-                  <div className="text-lg font-bold text-on-surface">{walletData?.summary?.total_assets_display || '$0.00'}</div>
+              <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+                <div className="tonal-panel p-5 space-y-1 bg-surface-container-low hover:bg-surface-container-high transition-colors duration-300">
+                  <span className="section-kicker block">Total Assets</span>
+                  <div className="text-lg font-semibold text-on-surface">{walletData?.summary?.total_assets_display || '$0.00'}</div>
                 </div>
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
-                  <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
-                  <div className="text-lg font-bold text-tertiary-fixed-dim">{walletData?.trust_level || 'Pending'}</div>
+                <div className="tonal-panel p-5 space-y-1 bg-surface-container-low hover:bg-surface-container-high transition-colors duration-300">
+                  <span className="section-kicker block">Trust Score</span>
+                  <div className="text-lg font-semibold text-tertiary">{walletData?.trust_level || 'Pending'}</div>
                 </div>
               </section>
 
               <section className="space-y-3 max-w-4xl opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-                <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-on-surface-variant">Nada Risk Engine</p>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
+                <p className="section-kicker">Nada Risk Engine</p>
+                <h2 className="editorial-heading">Deep Credit Diagnostics</h2>
                 <p className="text-sm text-on-surface-variant max-w-2xl">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
               </section>
 
-              <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-                <div className="lg:col-span-8 space-y-8">
+              <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+                <div className="lg:col-span-8 space-y-8 md:space-y-10">
                   <ScoreBreakdown factors={walletData?.factors} />
                   <ScoreAnalysis score={creditScore} />
                 </div>
@@ -185,20 +184,22 @@ function App() {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-[#131313]/90 backdrop-blur-2xl rounded-t-3xl border-t border-[#b1c5ff]/15 shadow-2xl">
-        <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-16">
-          <button className="group flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-300 hover:shadow-glow hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
-          </button>
-          <button className="group flex flex-col items-center justify-center text-gray-500 hover:text-[#cdbdff] px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">history</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-[#cdbdff] transition-colors">History</span>
-          </button>
-          <button className="group flex flex-col items-center justify-center text-gray-500 hover:text-[#cdbdff] px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">verified_user</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-[#cdbdff] transition-colors">Security</span>
-          </button>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pb-4">
+        <div className="max-w-7xl mx-auto glass-panel ghost-outline rounded-t-3xl px-4 py-2">
+          <div className="w-full mx-auto flex justify-around sm:justify-center sm:gap-16">
+            <button className="group flex flex-col items-center justify-center text-tertiary-fixed-dim bg-surface-container-high rounded-lg px-4 py-2 transition-colors duration-300">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
+            </button>
+            <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-tertiary px-4 py-2 transition-colors duration-300">
+              <span className="material-symbols-outlined">history</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest mt-1">History</span>
+            </button>
+            <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-tertiary px-4 py-2 transition-colors duration-300">
+              <span className="material-symbols-outlined">verified_user</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Security</span>
+            </button>
+          </div>
         </div>
       </nav>
     </div>

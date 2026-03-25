@@ -15,10 +15,10 @@ const CreditScoreSpeedometer = ({ score }) => {
   const clampedProgress = Math.max(0, Math.min(1, progress));
   
   const getBand = (value) => {
-    if (value < 580) return { label: 'Risk', colorClass: 'text-error' };
-    if (value < 670) return { label: 'Fair', colorClass: 'text-secondary' };
-    if (value < 740) return { label: 'Good', colorClass: 'text-primary' };
-    return { label: 'Excellent', colorClass: 'text-tertiary' };
+    if (value < 580) return { label: 'Risk', colorClass: 'text-error', chipBg: 'bg-error/10' };
+    if (value < 670) return { label: 'Fair', colorClass: 'text-on-surface-variant', chipBg: 'bg-surface-container-low' };
+    if (value < 740) return { label: 'Good', colorClass: 'text-secondary', chipBg: 'bg-secondary/10' };
+    return { label: 'Excellent', colorClass: 'text-secondary', chipBg: 'bg-secondary/10' };
   };
 
   const band = getBand(score);
@@ -35,26 +35,22 @@ const CreditScoreSpeedometer = ({ score }) => {
   const startAngle = 140;
 
   return (
-    <section className="relative flex flex-col items-center justify-center py-8">
-      <div className="relative w-[20rem] h-[20rem] sm:w-[24rem] sm:h-[24rem] flex items-center justify-center group cursor-default">
-        
-        {/* Ambient background external glow */}
-        <div className="absolute inset-0 rounded-full bg-primary/5 blur-[80px] group-hover:bg-primary/10 transition-colors duration-700"></div>
+    <section className="relative flex flex-col items-center justify-center py-2 sm:py-4">
+      <div className="tonal-panel ghost-outline relative w-[20rem] h-[20rem] sm:w-[24rem] sm:h-[24rem] flex items-center justify-center glass-panel cursor-default">
+        <div className="absolute inset-0 rounded-full bg-primary/5 blur-[60px] pointer-events-none"></div>
 
-        <svg 
-          viewBox="0 0 300 300" 
-          className="w-full h-full relative z-10 transition-transform duration-700 group-hover:scale-105"
+        <svg
+          viewBox="0 0 300 300"
+          className="w-full h-full relative z-10"
         >
           <defs>
             <linearGradient id="scoreGlow" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="currentColor" className="text-error" />
-              <stop offset="35%" stopColor="currentColor" className="text-secondary" />
-              <stop offset="70%" stopColor="currentColor" className="text-primary" />
-              <stop offset="100%" stopColor="currentColor" className="text-tertiary" />
+              <stop offset="0%" stopColor="#b1c5ff" />
+              <stop offset="100%" stopColor="#cdbdff" />
             </linearGradient>
 
             <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="8" result="blur" />
+              <feGaussianBlur stdDeviation="3" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -65,25 +61,14 @@ const CreditScoreSpeedometer = ({ score }) => {
           <circle
             cx="150"
             cy="150"
-            r={radius + 14}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeDasharray="4 8"
-            className="text-outline-variant opacity-50"
-          />
-
-          <circle
-            cx="150"
-            cy="150"
             r={radius}
             fill="none"
             stroke="currentColor"
-            strokeWidth="16"
+            strokeWidth="20"
             strokeLinecap="round"
             strokeDasharray={`${arcLength} ${gap}`}
             transform={`rotate(${startAngle} 150 150)`}
-            className="text-surface-container-highest"
+            className="text-surface-container-highest opacity-90"
           />
 
           <circle
@@ -92,7 +77,7 @@ const CreditScoreSpeedometer = ({ score }) => {
             r={radius}
             fill="none"
             stroke="url(#scoreGlow)"
-            strokeWidth="16"
+            strokeWidth="20"
             strokeLinecap="round"
             strokeDasharray={`${circumference} ${circumference}`}
             style={{ 
@@ -104,27 +89,26 @@ const CreditScoreSpeedometer = ({ score }) => {
           />
         </svg>
 
-        <div className="absolute flex flex-col items-center justify-center bg-surface-container-high/90 backdrop-blur-xl rounded-full w-56 h-56 sm:w-64 sm:h-64 border border-outline-variant/15 shadow-lg z-20 overflow-hidden transition-all duration-700 group-hover:border-outline-variant/30 group-hover:shadow-xl">
-          <div className="absolute -top-12 -right-6 w-32 h-32 bg-tertiary/20 rounded-full blur-3xl opacity-70"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
+        <div className="absolute flex flex-col items-center justify-center bg-surface-container-highest/90 backdrop-blur-glass rounded-full w-56 h-56 sm:w-64 sm:h-64 ghost-outline shadow-ambient z-20 overflow-hidden">
+          <div className="absolute inset-0 shimmer-loading opacity-30"></div>
           
           <div className="relative z-10 flex flex-col items-center mt-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <span className="w-2 h-2 rounded-full animate-pulse bg-tertiary shadow-[0_0_8px_rgba(205,189,255,0.8)]"></span>
+              <span className="w-2 h-2 rounded-full animate-pulse bg-tertiary"></span>
               <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.25em] text-on-surface-variant uppercase">Credit Score</span>
             </div>
             
-            <div className="text-7xl sm:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-tr from-primary to-tertiary drop-shadow-[0_0_20px_rgba(177,197,255,0.2)] mb-2">
+            <div className="text-7xl sm:text-8xl font-black tracking-tighter ai-shimmer mb-2">
               {score}
             </div>
             
             <div className="flex items-center gap-2 mt-2">
                <span 
-                 className={`rounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container-low border border-outline-variant/15 backdrop-blur-sm ${band.colorClass}`}
+                 className={`rounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest ${band.chipBg} ${band.colorClass}`}
                >
                  {band.label}
                </span>
-               <span className="rounded-lg px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container-low border border-outline-variant/15 text-on-surface-variant">
+               <span className="rounded-lg px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest bg-surface-container-low text-on-surface-variant">
                  30d Live
                </span>
             </div>

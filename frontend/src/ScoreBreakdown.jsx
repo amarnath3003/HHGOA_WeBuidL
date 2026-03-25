@@ -5,14 +5,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const fallbackFactors = [
-    { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.4)', impact: 'Primary driver', icon: 'account_balance_wallet' },
-    { name: 'Transaction History', percentage: 25, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.4)', impact: 'Behavioral consistency', icon: 'history' },
-    { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.4)', impact: 'Asset credibility', icon: 'token' },
-    { name: 'Account Age', percentage: 15, color: '#14d1ff', glow: 'rgba(20, 209, 255, 0.4)', impact: 'Longevity signal', icon: 'hourglass_empty' },
-    { name: 'Network Diversity', percentage: 10, color: '#7f72ff', glow: 'rgba(127, 114, 255, 0.4)', impact: 'Cross-chain resilience', icon: 'lan' },
-  ];
+  { name: 'Wallet Balance', percentage: 30, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.35)', impact: 'Primary driver', icon: 'account_balance_wallet' },
+  { name: 'Transaction History', percentage: 25, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.3)', impact: 'Behavioral consistency', icon: 'history' },
+  { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.3)', impact: 'Asset credibility', icon: 'token' },
+  { name: 'Account Age', percentage: 15, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.3)', impact: 'Longevity signal', icon: 'hourglass_empty' },
+  { name: 'Network Diversity', percentage: 10, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.3)', impact: 'Cross-chain resilience', icon: 'lan' },
+];
 
 const ScoreBreakdown = ({ factors = fallbackFactors }) => {
+  const factorList = Array.isArray(factors) && factors.length > 0 ? factors : fallbackFactors;
 
   const generateMockData = () => {
     return Array.from({ length: 12 }, () => Math.floor(Math.random() * 40) + 60);
@@ -27,10 +28,10 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
         enabled: true,
         mode: 'index',
         intersect: false,
-        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-        titleColor: '#f8fafc',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(31, 32, 32, 0.92)',
+        titleColor: '#e4e2e1',
+        bodyColor: '#c3c6d6',
+        borderColor: 'rgba(67, 70, 83, 0.2)',
         borderWidth: 1,
         padding: 10,
         displayColors: false,
@@ -54,38 +55,34 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
     }
   };
 
-  const topFactor = factors[0];
+  const topFactor = factorList[0];
 
   return (
-    <section className="relative rounded-lg bg-surface-container/80 backdrop-blur-[20px] p-6 md:p-8 shadow-ambient overflow-hidden border border-outline-variant/15">
-      {/* Decorative background glow */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] pointer-events-none"></div>
+    <section className="relative tonal-panel glass-panel ghost-outline p-6 md:p-8 overflow-hidden">
+      <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/15 rounded-full blur-[80px] pointer-events-none"></div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-10">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-primary text-sm">equalizer</span>
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary">Score Breakdown</p>
+            <span className="material-symbols-outlined text-tertiary text-sm">equalizer</span>
+            <p className="section-kicker">Score Breakdown</p>
           </div>
-          <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-tr from-primary to-tertiary bg-clip-text text-transparent">
-            Factor Matrix
-          </h3>
+          <h3 className="editorial-heading">Factor Matrix</h3>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant/15 bg-surface-container-highest backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low">
+          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
           <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant">Weighted / Dynamic</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 relative z-10 bg-surface-container-low p-5 rounded-lg">
-        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 md:mb-10 relative z-10 bg-surface-container-low rounded-xl p-5">
+        <div className="group rounded-xl bg-surface-container-high p-5 transition-colors duration-300 hover:bg-surface-container-highest">
+          <div className="relative h-full">
             <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
               <span className="material-symbols-outlined text-[18px] text-primary">star</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Top Factor</p>
             </div>
-            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">{topFactor.name}</p>
+            <p className="text-lg font-semibold text-on-surface mb-1 group-hover:text-primary transition-colors">{topFactor.name}</p>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-lg">{topFactor.percentage}%</span>
               <span className="text-xs text-on-surface-variant">Total Weight</span>
@@ -93,31 +90,31 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
           </div>
         </div>
 
-        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+        <div className="group rounded-xl bg-surface-container-high p-5 transition-colors duration-300 hover:bg-surface-container-highest">
+          <div className="relative h-full">
             <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
               <span className="material-symbols-outlined text-[18px] text-tertiary">verified_user</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Model Confidence</p>
             </div>
-            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-tertiary transition-colors">High</p>
+            <p className="text-lg font-semibold text-on-surface mb-1 group-hover:text-tertiary transition-colors">High</p>
             <p className="text-xs text-on-surface-variant">Stable over 90 days</p>
           </div>
         </div>
 
-        <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
+        <div className="group rounded-xl bg-surface-container-high p-5 transition-colors duration-300 hover:bg-surface-container-highest">
+          <div className="relative h-full">
             <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
               <span className="material-symbols-outlined text-[18px] text-secondary">trending_up</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Volatility</p>
             </div>
-            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-secondary transition-colors">Low</p>
+            <p className="text-lg font-semibold text-on-surface mb-1 group-hover:text-secondary transition-colors">Low</p>
             <p className="text-xs text-on-surface-variant">Predictive drift: <span className="text-secondary font-mono">1.9%</span></p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
-        {factors.map((factor, index) => {
+        {factorList.map((factor, index) => {
           const mockData = generateMockData();
           
           const chartData = {
@@ -139,43 +136,44 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
           };
 
           return (
-            <article 
-              key={index} 
-              className="group flex flex-col justify-between rounded-lg bg-surface-container-highest p-5 border border-outline-variant/15 hover:bg-surface-container-highest/80 transition-all duration-300"
+            <article
+              key={index}
+              className="group rounded-xl overflow-hidden bg-surface-container-low hover:bg-surface-container transition-colors duration-300"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant/15 group-hover:scale-110 transition-transform duration-300"
-                    style={{ color: factor.color, boxShadow: `0 0 20px -5px ${factor.glow}` }}
+              <div className="p-5 bg-surface-container-low">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center bg-surface-container-high"
+                      style={{ color: factor.color }}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">{factor.icon}</span>
+                    </div>
+                    <div>
+                      <h4 className="text-base font-semibold text-on-surface">{factor.name}</h4>
+                      <p className="text-xs text-on-surface-variant mt-0.5">{factor.impact}</p>
+                    </div>
+                  </div>
+                  <div
+                    className="px-2.5 py-1 rounded-lg bg-surface-container-high"
+                    style={{ color: factor.color }}
                   >
-                    <span className="material-symbols-outlined text-[20px]">{factor.icon}</span>
-                  </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-on-surface group-hover:text-primary transition-colors">{factor.name}</h4>
-                    <p className="text-xs text-on-surface-variant mt-0.5">{factor.impact}</p>
+                    <span className="text-sm font-semibold">{factor.percentage}%</span>
                   </div>
                 </div>
-                <div 
-                  className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/15 backdrop-blur-sm"
-                  style={{ color: factor.color }}
-                >
-                  <span className="text-sm font-bold">{factor.percentage}%</span>
+
+                <div className="relative h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+                  <div
+                    className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${factor.percentage}%`,
+                      background: 'linear-gradient(45deg, #b1c5ff, #cdbdff)'
+                    }}
+                  />
                 </div>
               </div>
 
-              <div className="relative h-1.5 w-full bg-surface-container rounded-full overflow-hidden mb-5">
-                <div 
-                  className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ease-out origin-left group-hover:scale-x-[1.02]"
-                  style={{ 
-                    width: `${factor.percentage}%`, 
-                    backgroundColor: factor.color,
-                    boxShadow: `0 0 10px ${factor.color}` 
-                  }}
-                />
-              </div>
-
-              <div className="h-[60px] w-full mt-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="h-[72px] w-full bg-surface-container-high p-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                 <Line data={chartData} options={chartOptions} />
               </div>
             </article>
