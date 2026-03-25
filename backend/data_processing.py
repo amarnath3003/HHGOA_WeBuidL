@@ -547,10 +547,6 @@ def _rpc_candidates(spec: ChainSpec) -> list[str]:
         if legacy_value:
             candidates.append(legacy_value)
 
-    for default_candidate in spec.default_rpc_candidates:
-        if default_candidate:
-            candidates.append(default_candidate)
-
     unique_candidates: list[str] = []
     for candidate in candidates:
         if candidate not in unique_candidates:
@@ -571,8 +567,6 @@ def _nft_endpoint_candidates(spec: ChainSpec) -> list[str]:
         legacy = os.getenv("ETHERSCORE_NFT_API_URL", "").strip()
         if legacy:
             candidates.append(legacy)
-        if spec.default_nft_endpoint:
-            candidates.append(spec.default_nft_endpoint)
 
     unique_candidates: list[str] = []
     for candidate in candidates:
@@ -752,21 +746,13 @@ def _risk_regime(score: int, volatility_index: float) -> str:
     return "Watchlist"
 
 
-def _percentile(score: int) -> int:
-    return int(round(_clamp((score - 300) / 550.0, 0.01, 0.99) * 100))
+def _percentile_from_reference(score: int, reference_scores: Sequence[float]) -> int:
+    if not reference_scores:
+        return int(round(_clamp((score - 300) / 550.0, 0.01, 0.99) * 100))
 
-
-def _build_trend_series(seed: str, factor_score: int) -> list[int]:
-    digest = hashlib.sha256(seed.encode("utf-8")).digest()
-    baseline = 56 + (factor_score * 0.4)
-    series: list[int] = []
-
-    for month in range(12):
-        offset = (digest[month] - 128) / 12.0
-        value = int(round(_clamp(baseline + offset, 40.0, 100.0)))
-        series.append(value)
-
-    return series
+    below_or_equal = sum(1 for reference in reference_scores if reference <= score)
+    percentile = (below_or_equal / len(reference_scores)) * 100.0
+    return int(round(_clamp(percentile, 1.0, 99.0)))
 
 
 def _factor_rationale(factor_name: str, normalized_value: float) -> str:
