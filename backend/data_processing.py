@@ -18,7 +18,9 @@ AVERAGE_SCORE = 720
 USDT_CONTRACT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 USDT_DECIMALS = 6
 
-RPC_URL = os.getenv("ETHERSCORE_RPC_URL", "https://eth-mainnet.g.alchemy.com/v2/demo")
+DEFAULT_INFURA_RPC_URL = "https://mainnet.infura.io/v3/84842078b09946638c03157f83405213"
+DEFAULT_ALCHEMY_RPC_URL = "https://eth-mainnet.g.alchemy.com/v2/demo"
+PRIMARY_RPC_URL = os.getenv("ETHERSCORE_RPC_URL", "").strip()
 NFT_API_URL = os.getenv(
     "ETHERSCORE_NFT_API_URL",
     "https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner",
@@ -32,6 +34,7 @@ ETH_FALLBACK_PRICE_USD = float(os.getenv("ETHERSCORE_FALLBACK_ETH_PRICE_USD", "3
 NFT_FALLBACK_FLOOR_USD = float(os.getenv("ETHERSCORE_FALLBACK_NFT_FLOOR_USD", "120"))
 REQUEST_TIMEOUT_SECONDS = float(os.getenv("ETHERSCORE_REQUEST_TIMEOUT_SECONDS", "12"))
 PAYLOAD_CACHE_TTL_SECONDS = float(os.getenv("ETHERSCORE_CACHE_TTL_SECONDS", "120"))
+HTTP_USER_AGENT = os.getenv("ETHERSCORE_HTTP_USER_AGENT", "EtherScoreBackend/2.0 (+local)")
 
 _payload_cache: dict[str, tuple[float, dict[str, Any]]] = {}
 _eth_price_cache: tuple[datetime, float] | None = None
@@ -55,6 +58,7 @@ class FactorDefinition:
 @dataclass(frozen=True)
 class WalletSnapshot:
     address: str
+    rpc_source: str
     eth_balance: float
     usdt_balance: float
     transaction_count: int
@@ -160,7 +164,10 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
 
 def _request_json(url: str, *, method: str = "GET", payload: dict[str, Any] | None = None) -> dict[str, Any]:
     request_body = None
-    headers = {"Accept": "application/json"}
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": HTTP_USER_AGENT,
+    }
     if payload is not None:
         request_body = json.dumps(payload).encode("utf-8")
         headers["Content-Type"] = "application/json"
@@ -348,6 +355,9 @@ def _fetch_first_transaction_age_days_from_etherscan(address: str) -> int | None
 
 
 def _fetch_nft_snapshot(address: str) -> tuple[int, list[tuple[str, int]]]:
+    if not NFT_API_URL.strip():
+        return 0, []
+
     query = urlencode({"owner": address, "withMetadata": "false", "pageSize": "100"})
     endpoint = f"{NFT_API_URL}?{query}"
 
@@ -478,6 +488,8 @@ def _percentile(score: int) -> int:
 
 
 def _source_name(endpoint: str) -> str:
+    if not endpoint:
+        return "not configured"
     parsed = urlparse(endpoint)
     return parsed.netloc or endpoint
 
@@ -486,16 +498,39 @@ def is_valid_wallet_address(address: str) -> bool:
     return bool(ETH_ADDRESS_PATTERN.fullmatch(address.strip()))
 
 
-def _build_wallet_snapshot(address: str) -> WalletSnapshot:
-    rpc = EthereumRpcClient(RPC_URL)
+def _rpc_candidates() -> list[str]:
+    candidates: list[str] = []
+    for endpoint in (PRIMARY_RPC_URL, DEFAULT_INFURA_RPC_URL, DEFAULT_ALCHEMY_RPC_URL):
+        cleaned = endpoint.strip()
+        if cleaned and cleaned not in candidates:
+            candidates.append(cleaned)
+    return candidates
 
-    try:
-        eth_balance = rpc.get_eth_balance(address)
-        transaction_count = rpc.get_transaction_count(address)
-    except ExternalServiceError as exc:
+
+def _build_wallet_snapshot(address: str) -> WalletSnapshot:
+    rpc: EthereumRpcClient | None = None
+    active_rpc = ""
+    eth_balance = 0.0
+    transaction_count = 0
+    core_error: ExternalServiceError | None = None
+
+    for rpc_endpoint in _rpc_candidates():
+        candidate = EthereumRpcClient(rpc_endpoint)
+        try:
+            eth_balance = candidate.get_eth_balance(address)
+            transaction_count = candidate.get_transaction_count(address)
+            rpc = candidate
+            active_rpc = rpc_endpoint
+            core_error = None
+            break
+        except ExternalServiceError as exc:
+            core_error = exc
+            continue
+
+    if rpc is None:
         raise ExternalServiceError(
-            "Unable to fetch core wallet metrics from the configured RPC provider."
-        ) from exc
+            "Unable to fetch core wallet metrics from available RPC providers."
+        ) from core_error
 
     try:
         usdt_balance = rpc.get_usdt_balance(address)
@@ -509,6 +544,7 @@ def _build_wallet_snapshot(address: str) -> WalletSnapshot:
 
     return WalletSnapshot(
         address=address,
+        rpc_source=active_rpc,
         eth_balance=eth_balance,
         usdt_balance=usdt_balance,
         transaction_count=transaction_count,
@@ -635,7 +671,7 @@ def build_score_payload(address: str) -> dict[str, Any]:
     except ExternalServiceError as exc:
         raise RuntimeError(
             "Unable to fetch wallet metrics from upstream providers. "
-            "Check ETHERSCORE_RPC_URL or try again shortly."
+            "Set ETHERSCORE_RPC_URL to a valid Ethereum RPC endpoint and try again."
         ) from exc
 
     eth_price_usd = _get_eth_price_usd()
@@ -658,6 +694,10 @@ def build_score_payload(address: str) -> dict[str, Any]:
             model_metrics["wallet_balance_usd"],
             model_metrics["account_age_for_model"],
         )
+        display_value = _format_factor_value(definition, raw_value)
+        if definition.name == "Account Age" and snapshot.account_age_days is None:
+            display_value = "Unknown"
+
         factors.append(
             {
                 "name": definition.name,
@@ -666,7 +706,7 @@ def build_score_payload(address: str) -> dict[str, Any]:
                 "icon": definition.icon,
                 "color": definition.color,
                 "glow": definition.glow,
-                "value": _format_factor_value(definition, raw_value),
+                "value": display_value,
                 "score": factor_score,
                 "weighted_points": weighted_points,
                 "trend": _build_trend_series(factor_score),
@@ -693,7 +733,7 @@ def build_score_payload(address: str) -> dict[str, Any]:
         "network_diversity": snapshot.token_diversity,
         "volatility_index": volatility_index,
         "data_sources": {
-            "rpc": _source_name(RPC_URL),
+            "rpc": _source_name(snapshot.rpc_source),
             "nft_api": _source_name(NFT_API_URL),
             "ens_api": _source_name(ENS_API_URL),
         },
