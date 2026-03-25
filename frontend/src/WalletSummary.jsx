@@ -10,9 +10,9 @@ const fallbackSummary = {
 };
 
 const fallbackCollections = [
-  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: '#a6e6ff' },
+  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: '#b1c5ff' },
   { name: 'Signal Archive', tier: 'Growth', estimated_value_display: '$0.00', accent: '#cdbdff' },
-  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: '#b1c5ff' },
+  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: '#622ae4' },
 ];
 
 const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallbackCollections }) => {
@@ -49,8 +49,8 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
       value: `${walletSummary.network_diversity ?? 0} chains`,
       subtitle: `${walletSummary.nft_count ?? 0} NFTs tracked`,
       icon: 'lan',
-      color: 'text-secondary',
-      background: 'bg-secondary/10',
+      color: 'text-primary',
+      background: 'bg-primary/10',
     },
   ];
 

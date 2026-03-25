@@ -36,12 +36,12 @@ const ScoreAnalysis = ({ score }) => {
     { label: 'Bottom 25%', value: 640 },
   ];
 
-  const deltaTextClass = delta >= 0 ? 'text-secondary' : 'text-error';
+  const deltaTextClass = delta >= 0 ? 'text-tertiary' : 'text-error';
 
   return (
     <section className="relative rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-outline-variant/15 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
       <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
@@ -104,7 +104,7 @@ const ScoreAnalysis = ({ score }) => {
         <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8">
           <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-surface-bright/10 border border-outline-variant/15">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-3">Your Score</span>
-            <span className="text-secondary text-5xl md:text-7xl font-black tracking-tighter">{score}</span>
+            <span className="text-tertiary text-5xl md:text-7xl font-black tracking-tighter">{score}</span>
           </div>
           <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-black/20 border border-outline-variant/15">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-3">Network Avg</span>

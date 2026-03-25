@@ -17,8 +17,8 @@ const CreditScoreSpeedometer = ({ score }) => {
   const getBand = (value) => {
     if (value < 580) return { label: 'Risk', colorClass: 'text-error' };
     if (value < 670) return { label: 'Fair', colorClass: 'text-on-surface-variant' };
-    if (value < 740) return { label: 'Good', colorClass: 'text-secondary' };
-    return { label: 'Excellent', colorClass: 'text-secondary' };
+    if (value < 740) return { label: 'Good', colorClass: 'text-primary' };
+    return { label: 'Excellent', colorClass: 'text-tertiary' };
   };
 
   const band = getBand(score);

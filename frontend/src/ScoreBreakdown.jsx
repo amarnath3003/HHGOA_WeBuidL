@@ -5,11 +5,11 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const fallbackFactors = [
-  { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.35)', impact: 'Primary driver', icon: 'account_balance_wallet' },
+  { name: 'Wallet Balance', percentage: 30, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.35)', impact: 'Primary driver', icon: 'account_balance_wallet' },
   { name: 'Transaction History', percentage: 25, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.35)', impact: 'Behavioral consistency', icon: 'history' },
   { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.35)', impact: 'Asset credibility', icon: 'token' },
   { name: 'Account Age', percentage: 15, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.35)', impact: 'Longevity signal', icon: 'hourglass_empty' },
-  { name: 'Network Diversity', percentage: 10, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.35)', impact: 'Cross-chain resilience', icon: 'lan' },
+  { name: 'Network Diversity', percentage: 10, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.35)', impact: 'Cross-chain resilience', icon: 'lan' },
   ];
 
 const ScoreBreakdown = ({ factors = fallbackFactors }) => {
@@ -60,7 +60,7 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
     <section className="relative rounded-lg bg-surface-container/80 backdrop-blur-[20px] p-6 md:p-8 shadow-ambient overflow-hidden border border-outline-variant/15">
       {/* Decorative background glow */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] pointer-events-none"></div>
+      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-tertiary/10 rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
@@ -73,7 +73,7 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
           </h3>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant/15 bg-surface-container-highest backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
           <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant">Weighted / Dynamic</span>
         </div>
       </div>
@@ -107,11 +107,11 @@ const ScoreBreakdown = ({ factors = fallbackFactors }) => {
         <div className="group relative rounded-lg overflow-hidden transition-transform hover:-translate-y-1">
           <div className="relative h-full rounded-lg bg-surface-container-highest p-5">
             <div className="flex items-center gap-2 mb-3 text-on-surface-variant">
-              <span className="material-symbols-outlined text-[18px] text-secondary">trending_up</span>
+              <span className="material-symbols-outlined text-[18px] text-tertiary">trending_up</span>
               <p className="text-[10px] font-mono uppercase tracking-widest">Volatility</p>
             </div>
-            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-secondary transition-colors">Low</p>
-            <p className="text-xs text-on-surface-variant">Predictive drift: <span className="text-secondary font-mono">1.9%</span></p>
+            <p className="text-lg font-bold text-on-surface mb-1 group-hover:text-tertiary transition-colors">Low</p>
+            <p className="text-xs text-on-surface-variant">Predictive drift: <span className="text-tertiary font-mono">1.9%</span></p>
           </div>
         </div>
       </div>
