@@ -1,80 +1,197 @@
-🚀 EtherScore - Decentralized Credit Scoring dApp 🛡️
-Overview 🌐
-Our Decentralized Credit Scoring dApp provides a secure, privacy-preserving alternative to traditional credit scoring. By leveraging blockchain technology, it allows users to utilize their digital assets—such as USDT balances, NFT holdings, and ENS tokens—for accurate credit assessments. All data is processed using Nada AI’s blind computation to ensure user privacy and security. 🔒
+# EtherScore
 
-Features ✨
-🔗 Decentralized Data Fetching: Query and analyze blockchain-based assets directly from your wallet using The Graph Protocol.
-🛡️ Privacy-Preserving Computation: Data is processed securely using Nada AI's blind computation, ensuring that personal financial information remains confidential.
-⚖️ Fair Credit Assessment: Provides an unbiased credit score based on actual blockchain holdings, accessible to anyone, regardless of traditional credit history.
-Problem Solved 🛠️
-Traditional credit scoring systems are often intrusive, centralized, and prone to data breaches. Many individuals in the decentralized finance (DeFi) space lack traditional credit histories, limiting their access to financial services. Our dApp solves these issues by offering a decentralized, secure, and privacy-respecting alternative for credit assessments.
+On-chain wallet credit scoring dashboard with a React frontend and a Python backend API.
 
-Use Cases 🎯
-👥 For Individuals: Secure access to loans or financial services using blockchain holdings as the basis for creditworthiness.
-🏦 For Financial Institutions: A transparent and reliable way to assess the creditworthiness of individuals in the DeFi space without intrusive data collection.
-Architecture 🏗️
-📊 Data Querying with The Graph Protocol:
+EtherScore computes a wallet score from live Ethereum data (ETH + USDT balances, NFT holdings, transaction history, account age, and token diversity), then visualizes diagnostics in a modern UI.
 
-Users input their wallet address.
-The dApp queries relevant data from The Graph Protocol, including USDT balances, NFT holdings, and ENS tokens.
-🔒 Privacy-Preserving Computation with Nada AI:
+## Table of Contents
 
-The fetched data is passed to Nada AI’s blind computation model.
-The AI processes the data securely, generating a credit score without exposing sensitive information.
-📈 Credit Score Generation:
+- [Overview](#overview)
+- [How Scoring Works](#how-scoring-works)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Troubleshooting](#troubleshooting)
+- [Roadmap](#roadmap)
+- [License](#license)
 
-The dApp outputs a credit score based on the processed blockchain data.
-Users can use this score to access various financial services.
-Installation ⚙️
-Prerequisites 📋
-Node.js
-npm (Node Package Manager)
-A wallet with blockchain assets (e.g., MetaMask)
-Steps 🛠️
-Clone the repository:
-bash
-Copy code
-git clone https://github.com/your-repo/credit-scoring-dapp.git
-Navigate to the project directory:
-bash
-Copy code
-cd credit-scoring-dapp
-Install dependencies:
-bash
-Copy code
+## Overview
+
+Traditional credit systems miss users who are financially active on-chain but invisible in legacy credit rails.
+
+EtherScore addresses this by:
+
+- Pulling wallet signals from public blockchain APIs.
+- Computing a weighted score in the `300–850` range.
+- Returning transparent factor-by-factor breakdowns.
+- Displaying risk and trust diagnostics in a browser dashboard.
+
+## How Scoring Works
+
+Backend scoring currently uses five weighted factors:
+
+| Factor | Weight | Signal |
+| --- | ---: | --- |
+| Wallet Balance | 30% | ETH + USDT value in USD |
+| Transaction History | 25% | Transaction count |
+| NFT Holdings | 20% | NFT ownership volume |
+| Account Age | 15% | Estimated wallet age |
+| Network Diversity | 10% | Token diversity |
+
+The normalized weighted total is mapped into the `300–850` range, and the API also returns:
+
+- `score_band` (e.g., Good, Very Good)
+- `trust_level` (Low → High)
+- `risk_regime` (Stable / Balanced / Watchlist)
+- `summary`, `factors`, and `featured_collections`
+
+## Tech Stack
+
+### Frontend
+
+- React 18 + Vite
+- Tailwind CSS
+- Chart.js / react-chartjs-2
+- MetaMask integration (`@metamask/detect-provider`, `web3`)
+
+### Backend
+
+- Python 3 (standard-library HTTP server)
+- JSON-RPC calls to Ethereum endpoints
+- External APIs for ETH price, NFTs, ENS, and optional Etherscan fallback
+
+## Project Structure
+
+```text
+backend/
+	main.py                 # HTTP API server
+	data_processing.py      # Wallet data fetch + scoring logic
+
+frontend/
+	src/
+		App.jsx               # Main application flow
+		CreditScoreSpeedometer.jsx
+		WalletSummary.jsx
+		ScoreBreakdown.jsx
+		ScoreAnalysis.jsx
+```
+
+## Quick Start
+
+### 1) Prerequisites
+
+- Python 3.10+
+- Node.js 18+ and npm
+- MetaMask (or another injected Ethereum provider)
+
+### 2) Run Backend
+
+From repository root:
+
+```bash
+python backend/main.py --host 127.0.0.1 --port 8000
+```
+
+Backend health check:
+
+```bash
+curl http://127.0.0.1:8000/api/health
+```
+
+### 3) Run Frontend
+
+```bash
+cd frontend
 npm install
-Set up environment variables (e.g., API keys, contract addresses) in a .env file:
-bash
-Copy code
-REACT_APP_GRAPH_API_URL=https://api.thegraph.com/subgraphs/name/your-subgraph
-REACT_APP_NADA_AI_API_KEY=your-nada-ai-api-key
-Start the development server:
-bash
-Copy code
-npm start
-Challenges We Faced 🧩
-One significant challenge was ensuring the privacy of user data while performing accurate credit scoring. Blockchain data is sensitive, and we needed to analyze it without exposing personal details. We overcame this by integrating Nada AI’s blind computation, which allowed us to process data securely without compromising privacy.
+npm run dev
+```
 
-Another challenge was efficiently querying and processing data using The Graph Protocol. To address this, we fine-tuned our GraphQL queries and optimized our subgraphs for better performance, ensuring that the data was fetched accurately and efficiently.
+Open: `http://localhost:5173`
 
-Future Enhancements 🚀
-📈 Integration with more blockchain assets: Expanding the range of assets that can be used for credit scoring.
-🤖 Improved AI Models: Enhancing the accuracy and reliability of the credit scoring algorithm with more advanced AI models.
-📱 Mobile Application: Developing a mobile version of the dApp for easier access.
-Contributing 🤝
-We welcome contributions from the community! Please follow these steps to contribute:
+If backend is not on `http://127.0.0.1:8000`, set:
 
-Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Make your changes.
-Commit your changes (git commit -m 'Add new feature').
-Push to the branch (git push origin feature-branch).
-Open a pull request.
-License 📜
-This project is licensed under the MIT License. See the LICENSE file for more details.
+```bash
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
 
-Contact 📬
-For any questions, suggestions, or feedback, feel free to reach out to us:
+in `frontend/.env`.
 
-📧 Email: amarnathdevraj2005@gmail.com
-🐦 Twitter: @dani3deth
+## Environment Variables
+
+### Backend (optional)
+
+Set these in your shell before starting `backend/main.py`:
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `ETHERSCORE_HOST` | API bind host | `127.0.0.1` |
+| `ETHERSCORE_PORT` | API bind port | `8000` |
+| `ETHERSCORE_RPC_URL` | Primary Ethereum RPC endpoint | unset |
+| `ETHERSCORE_NFT_API_URL` | NFT ownership API | Alchemy demo endpoint |
+| `ETHERSCORE_ENS_API_URL` | ENS resolution API | `https://api.ensideas.com/ens/resolve` |
+| `ETHERSCORE_ETH_PRICE_API_URL` | ETH price feed | CoinGecko simple price endpoint |
+| `ETHERSCORE_FALLBACK_ETH_PRICE_USD` | Fallback ETH price | `3000` |
+| `ETHERSCORE_FALLBACK_NFT_FLOOR_USD` | Fallback NFT valuation | `120` |
+| `ETHERSCORE_REQUEST_TIMEOUT_SECONDS` | Upstream timeout | `12` |
+| `ETHERSCORE_CACHE_TTL_SECONDS` | Score payload cache TTL | `120` |
+| `ETHERSCORE_HTTP_USER_AGENT` | User-Agent header | `EtherScoreBackend/2.0 (+local)` |
+| `ETHERSCORE_ETHERSCAN_API_KEY` | Optional account-age fallback | unset |
+
+### Frontend
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Backend API base URL | `http://127.0.0.1:8000` |
+
+## API Reference
+
+Base URL: `http://127.0.0.1:8000`
+
+### `GET /api/health`
+
+Returns server status.
+
+### `POST /api/score`
+
+Request body:
+
+```json
+{
+	"address": "0x0000000000000000000000000000000000000000"
+}
+```
+
+Response includes:
+
+- `score`, `score_band`, `trust_level`, `risk_regime`
+- `summary` (balances, counts, sources, volatility)
+- `factors` (weight, score, trend, display value)
+- `featured_collections`
+
+### `GET /api/score/<wallet_address>`
+
+Equivalent to `POST /api/score`, but wallet address is passed in the URL path.
+
+### Error Behavior
+
+- `400` for invalid addresses or malformed JSON.
+- `502` when upstream providers fail (RPC/API unavailable).
+
+## Troubleshooting
+
+- **MetaMask not detected**: confirm extension is installed and unlocked.
+- **Score request fails**: verify backend is running and `VITE_API_BASE_URL` is correct.
+- **Frequent upstream errors**: set `ETHERSCORE_RPC_URL` to a reliable RPC provider key.
+- **Slow responses**: external APIs may rate-limit demo endpoints; use production API keys where possible.
+
+## Roadmap
+
+- Add multi-chain support beyond Ethereum mainnet.
+- Improve explainability with historical score snapshots.
+- Introduce model calibration against larger wallet cohorts.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
