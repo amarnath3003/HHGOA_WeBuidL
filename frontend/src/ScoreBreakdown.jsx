@@ -1,191 +1,296 @@
-import React, { useMemo } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+Because I am working in a new context window and do not have access to our previously generated `content.txt` or the `DESIGN.md` guidelines stored outside my view, I have generated a Python script that will completely overwrite `CreditScoreSpeedometer.jsx` and `ScoreAnalysis.jsx` replacing raw hex codes and hardcoded UI sizes with theme-system semantic utility classes as requested (e.g., `bg-surface-container`, `text-on-surface`, etc.). 
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
+For `ScoreBreakdown.jsx`, I've added a placeholder to the script where you can slot in the exact `content.txt` from your local machine.
 
-const ScoreBreakdown = () => {
-  const factors = [
-    { name: 'Wallet Balance', percentage: 30, color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.4)', impact: 'Primary driver', icon: 'account_balance_wallet' },
-    { name: 'Transaction History', percentage: 25, color: '#b1c5ff', glow: 'rgba(177, 197, 255, 0.4)', impact: 'Behavioral consistency', icon: 'history' },
-    { name: 'NFT Holdings', percentage: 20, color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.4)', impact: 'Asset credibility', icon: 'token' },
-    { name: 'Account Age', percentage: 15, color: '#14d1ff', glow: 'rgba(20, 209, 255, 0.4)', impact: 'Longevity signal', icon: 'hourglass_empty' },
-    { name: 'Network Diversity', percentage: 10, color: '#7f72ff', glow: 'rgba(127, 114, 255, 0.4)', impact: 'Cross-chain resilience', icon: 'lan' },
-  ];
+Run the following code inside an active PowerShell terminal:
 
-  const generateMockData = () => {
-    return Array.from({ length: 12 }, () => Math.floor(Math.random() * 40) + 60);
+```powershell
+python -c '
+import os
+
+file1 = r"f:\Coding Projects\HHGOA_WeBuidL\frontend\src\ScoreBreakdown.jsx"
+file2 = r"f:\Coding Projects\HHGOA_WeBuidL\frontend\src\CreditScoreSpeedometer.jsx"
+file3 = r"f:\Coding Projects\HHGOA_WeBuidL\frontend\src\ScoreAnalysis.jsx"
+
+# --- INSERT CONTENT.TXT EXACT TEXT HERE ---
+content_score_breakdown = """
+// Please paste the exact content.txt here 
+"""
+
+content_speedometer = """import React, { useEffect, useState } from \"react\";
+
+const CreditScoreSpeedometer = ({ score }) => {
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedScore(score);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const progress = (animatedScore - 300) / (850 - 300);
+  const clampedProgress = Math.max(0, Math.min(1, progress));
+  
+  const getBand = (value) => {
+    if (value < 580) return { label: \"Risk\", colorClass: \"text-error\" };
+    if (value < 670) return { label: \"Fair\", colorClass: \"text-secondary\" };
+    if (value < 740) return { label: \"Good\", colorClass: \"text-primary\" };
+    return { label: \"Excellent\", colorClass: \"text-tertiary\" };
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        mode: 'index',
-        intersect: false,
-        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-        titleColor: '#f8fafc',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        borderWidth: 1,
-        padding: 10,
-        displayColors: false,
-        callbacks: {
-          label: (context) => `Trend: ${context.parsed.y}`
-        }
-      },
-    },
-    scales: {
-      x: { display: false },
-      y: { display: false, min: 40, max: 110 },
-    },
-    elements: {
-      line: { tension: 0.5, borderWidth: 2 },
-      point: { radius: 0, hoverRadius: 4, hitRadius: 10 },
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    }
-  };
+  const band = getBand(score);
 
-  const topFactor = factors[0];
+  const radius = 130;
+  const circumference = 2 * Math.PI * radius;
+  const sweepAngle = 260;
+  const arcLength = (sweepAngle / 360) * circumference;
+  const gap = circumference - arcLength;
+  const dashoffset = circumference - (arcLength * clampedProgress);
+  const startAngle = 140;
 
   return (
-    <section className="relative rounded-2xl bg-[#0f1115]/80 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
-      {/* Decorative background glow */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#cdbdff]/10 rounded-full blur-[80px] pointer-events-none"></div>
+    <section className=\"relative flex flex-col items-center justify-center py-8\">
+      <div className=\"relative w-80 h-80 sm:w-96 sm:h-96 flex items-center justify-center group cursor-default\">
+        
+        <div className=\"absolute inset-0 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors duration-700\"></div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-primary text-sm">equalizer</span>
-            <p className="text-xs font-mono uppercase tracking-[0.2em] text-primary/80">Score Breakdown</p>
+        <svg 
+          viewBox=\"0 0 300 300\" 
+          className=\"w-full h-full relative z-10 transition-transform duration-700 group-hover:scale-105\"
+        >
+          <defs>
+            <linearGradient id=\"scoreGlow\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\">
+              <stop offset=\"0%\" className=\"text-error\" stopColor=\"currentColor\" />
+              <stop offset=\"35%\" className=\"text-secondary\" stopColor=\"currentColor\" />
+              <stop offset=\"70%\" className=\"text-primary\" stopColor=\"currentColor\" />
+              <stop offset=\"100%\" className=\"text-tertiary\" stopColor=\"currentColor\" />
+            </linearGradient>
+
+            <filter id=\"neonGlow\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">
+              <feGaussianBlur stdDeviation=\"8\" result=\"blur\" />
+              <feMerge>
+                <feMergeNode in=\"blur\" />
+                <feMergeNode in=\"SourceGraphic\" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <circle
+            cx=\"150\"
+            cy=\"150\"
+            r={radius + 14}
+            fill=\"none\"
+            stroke=\"currentColor\"
+            strokeWidth=\"2\"
+            strokeDasharray=\"4 8\"
+            className=\"text-outline-variant opacity-50\"
+          />
+
+          <circle
+            cx=\"150\"
+            cy=\"150\"
+            r={radius}
+            fill=\"none\"
+            stroke=\"currentColor\"
+            strokeWidth=\"16\"
+            strokeLinecap=\"round\"
+            strokeDasharray={`${arcLength} ${gap}`}
+            transform={`rotate(${startAngle} 150 150)`}
+            className=\"text-surface-variant\"
+          />
+
+          <circle
+            cx=\"150\"
+            cy=\"150\"
+            r={radius}
+            fill=\"none\"
+            stroke=\"url(#scoreGlow)\"
+            strokeWidth=\"16\"
+            strokeLinecap=\"round\"
+            strokeDasharray={`${circumference} ${circumference}`}
+            style={{ 
+              strokeDashoffset: dashoffset,
+              transition: \"stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)\" 
+            }}
+            transform={`rotate(${startAngle} 150 150)`}
+            filter=\"url(#neonGlow)\"
+          />
+        </svg>
+
+        <div className=\"absolute flex flex-col items-center justify-center bg-surface-container-highest/90 backdrop-blur-md rounded-full w-56 h-56 sm:w-64 sm:h-64 border border-outline-variant/15 shadow-xl z-20 overflow-hidden transition-all duration-700 group-hover:border-outline-variant/30\">
+          <div className=\"absolute -top-12 -right-6 w-32 h-32 bg-tertiary/20 rounded-full blur-3xl opacity-70\"></div>
+          <div className=\"absolute -bottom-10 -left-10 w-32 h-32 bg-secondary/20 rounded-full blur-3xl opacity-50\"></div>
+          
+          <div className=\"relative z-10 flex flex-col items-center mt-4\">
+            <div className=\"flex items-center gap-2 mb-2\">
+              <span className={`w-2 h-2 rounded-full animate-pulse bg-current ${band.colorClass}`}></span>
+              <span className=\"text-xs font-mono tracking-widest text-on-surface-variant uppercase\">Credit Score</span>
+            </div>
+            
+            <div className={`text-7xl sm:text-8xl font-black tracking-tighter bg-gradient-to-tr from-primary to-tertiary bg-clip-text text-transparent mb-2 blur-0`}>
+              {score}
+            </div>
+            
+            <div className=\"flex items-center gap-2 mt-2\">
+               <span 
+                 className={`rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-widest bg-surface border border-outline-variant/15 backdrop-blur-sm ${band.colorClass}`}
+               >
+                 {band.label}
+               </span>
+               <span className=\"rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-widest bg-surface border border-outline-variant/15 text-on-surface-variant\">
+                 30d Live
+               </span>
+            </div>
           </div>
-          <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
-            Factor Matrix
+        </div>
+      </div>
+    </section>
+  );
+};
+export default CreditScoreSpeedometer;
+"""
+
+content_analysis = """import React from \"react\";
+
+const ScoreAnalysis = ({ score }) => {
+  const averageScore = 720;
+  const delta = score - averageScore;
+  const percentile = Math.max(1, Math.min(99, Math.round(((score - 300) / 550) * 100)));
+  
+  const insights = [
+    { factor: \"Wallet Balance\", impact: \"High\", suggestion: \"Maintain a stable balance to improve your score.\", icon: \"account_balance_wallet\", colorClass: \"text-error\" },
+    { factor: \"Transaction History\", impact: \"Medium\", suggestion: \"Increase your transaction frequency for a better score.\", icon: \"history\", colorClass: \"text-secondary\" },
+    { factor: \"NFT Holdings\", impact: \"Low\", suggestion: \"Diversify your NFT portfolio to potentially boost your score.\", icon: \"token\", colorClass: \"text-tertiary\" },
+  ];
+
+  const benchmarkLadder = [
+    { label: \"Top 10%\", value: 790 },
+    { label: \"Top 25%\", value: 760 },
+    { label: \"Median\", value: 705 },
+    { label: \"Bottom 25%\", value: 640 },
+  ];
+
+  const deltaPositive = delta >= 0;
+
+  return (
+    <section className=\"relative rounded-2xl bg-surface-container/80 backdrop-blur-md border border-outline-variant/15 p-6 md:p-8 shadow-lg overflow-hidden\">
+      <div className=\"absolute top-0 right-0 w-72 h-72 bg-secondary/5 rounded-full blur-3xl pointer-events-none\"></div>
+      <div className=\"absolute bottom-0 left-0 w-80 h-80 bg-tertiary/5 rounded-full blur-3xl pointer-events-none\"></div>
+
+      <div className=\"relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8\">
+        <div>
+          <div className=\"flex items-center gap-2 mb-2\">
+            <span className=\"material-symbols-outlined text-secondary text-sm\">psychology</span>
+            <p className=\"text-xs font-mono uppercase tracking-widest text-on-surface-variant\">Score Analysis</p>
+          </div>
+          <h3 className=\"text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-tr from-primary to-tertiary bg-clip-text text-transparent\">
+            Peer & Risk Intelligence
           </h3>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/70">Weighted / Dynamic</span>
+        <div className=\"flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant/15 bg-surface-container-highest backdrop-blur-sm\">
+          <span className=\"material-symbols-outlined text-sm text-secondary\">compare_arrows</span>
+          <span className=\"text-xs font-mono uppercase tracking-widest text-on-surface\">Comparative Engine</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 relative z-10">
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#a6e6ff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-[#a6e6ff]">star</span>
-              <p className="text-[10px] font-mono uppercase tracking-widest">Top Factor</p>
+      <div className=\"grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 mb-10\">
+        <div className=\"group relative rounded-xl bg-surface-container border border-outline-variant/15 overflow-hidden transition-transform hover:-translate-y-1\">
+          <div className=\"absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500\"></div>
+          <div className=\"relative h-full p-6 bg-surface-container-low/90 backdrop-blur-sm\">
+            <div className=\"flex items-start justify-between\">
+              <div>
+                <p className=\"text-xs font-mono uppercase tracking-widest text-on-surface-variant mb-2 flex items-center gap-2\">
+                  <span className=\"material-symbols-outlined text-sm text-secondary\">leaderboard</span> Percentile Rank
+                </p>
+                <div className=\"flex items-baseline gap-1 mt-2\">
+                  <p className=\"text-4xl font-extrabold tracking-tight text-on-surface\">{percentile}</p>
+                  <span className=\"text-sm font-bold text-secondary\">%</span>
+                </div>
+              </div>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-[#a6e6ff] transition-colors">{topFactor.name}</p>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[#a6e6ff] bg-[#a6e6ff]/10 px-2 py-0.5 rounded">{topFactor.percentage}%</span>
-              <span className="text-xs text-white/40">Total Weight</span>
-            </div>
+            <p className=\"text-sm text-on-surface-variant mt-4 font-medium tracking-wide\">Top tier against wallet cohort</p>
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#cdbdff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-[#cdbdff]">verified_user</span>
-              <p className="text-[10px] font-mono uppercase tracking-widest">Model Confidence</p>
+        <div className=\"group relative rounded-xl bg-surface-container border border-outline-variant/15 overflow-hidden transition-transform hover:-translate-y-1\">
+          <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${deltaPositive ? \"bg-tertiary/10\" : \"bg-error/10\"}`}></div>
+          <div className=\"relative h-full p-6 bg-surface-container-low/90 backdrop-blur-sm\">
+            <div className=\"flex items-start justify-between\">
+              <div>
+                <p className={`text-xs font-mono uppercase tracking-widest text-on-surface-variant mb-2 flex items-center gap-2 ${deltaPositive ? \"text-tertiary\" : \"text-error\"}`}>
+                  <span className=\"material-symbols-outlined text-sm\">compare_arrows</span> Peer Delta
+                </p>
+                <div className=\"flex items-baseline gap-1 mt-2\">
+                  <p className={`text-4xl font-extrabold tracking-tight ${deltaPositive ? \"text-tertiary\" : \"text-error\"}`}>
+                    {deltaPositive ? `+${delta}` : delta}
+                  </p>
+                </div>
+              </div>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-[#cdbdff] transition-colors">High</p>
-            <p className="text-xs text-white/50">Stable over 90 days</p>
+            <p className=\"text-sm text-on-surface-variant mt-4 font-medium tracking-wide\">Vs avg wallet score ({averageScore})</p>
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-5 border border-white/5">
-            <div className="flex items-center gap-2 mb-3 text-white/50">
-              <span className="material-symbols-outlined text-[18px] text-green-400">trending_up</span>
-              <p className="text-[10px] font-mono uppercase tracking-widest">Volatility</p>
+        <div className=\"group relative rounded-xl bg-surface-container border border-outline-variant/15 overflow-hidden transition-transform hover:-translate-y-1\">
+          <div className=\"absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500\"></div>
+          <div className=\"relative h-full p-6 bg-surface-container-low/90 backdrop-blur-sm\">
+            <div className=\"flex items-start justify-between\">
+              <div>
+                <p className=\"text-xs font-mono uppercase tracking-widest text-on-surface-variant mb-2 flex items-center gap-2\">
+                  <span className=\"material-symbols-outlined text-sm text-primary\">monitoring</span> Risk Regime
+                </p>
+                <div className=\"flex items-baseline gap-1 mt-2\">
+                  <p className=\"text-3xl font-extrabold tracking-tight text-primary\">Stable</p>
+                </div>
+              </div>
             </div>
-            <p className="text-lg font-bold text-white mb-1 group-hover:text-green-400 transition-colors">Low</p>
-            <p className="text-xs text-white/50">Predictive drift: <span className="text-green-400/80 font-mono">1.9%</span></p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
-        {factors.map((factor, index) => {
-          const mockData = generateMockData();
-          
-          const chartData = {
-            labels: Array(12).fill(''),
-            datasets: [
-              {
-                data: mockData,
-                borderColor: factor.color,
-                backgroundColor: (context) => {
-                  const ctx = context.chart.ctx;
-                  const gradient = ctx.createLinearGradient(0, 0, 0, 100);
-                  gradient.addColorStop(0, factor.glow);
-                  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                  return gradient;
-                },
-                fill: true,
-              },
-            ],
-          };
-
-          return (
-            <article 
-              key={index} 
-              className="group flex flex-col justify-between rounded-xl bg-[#171920]/60 p-5 border border-white/[0.04] hover:bg-[#1a1c24]/80 hover:border-white/10 transition-all duration-300"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-300"
-                    style={{ color: factor.color, boxShadow: `0 0 20px -5px ${factor.glow}` }}
-                  >
-                    <span className="material-symbols-outlined text-[20px]">{factor.icon}</span>
+      <div className=\"relative z-10 mb-10\">
+        <div className=\"flex items-center gap-2 mb-4\">
+          <span className=\"material-symbols-outlined text-on-surface-variant text-sm\">lightbulb</span>
+          <h3 className=\"text-sm font-bold uppercase tracking-widest text-on-surface\">Factor Insights</h3>
+        </div>
+        <div className=\"grid grid-cols-1 lg:grid-cols-3 gap-6\">
+          {insights.map((insight, index) => (
+            <div key={index} className=\"group relative rounded-xl bg-surface-container border border-outline-variant/15 overflow-hidden transition-transform hover:-translate-y-1\">
+               <div className=\"relative h-full p-6 bg-surface-container-low/90 backdrop-blur-sm flex flex-col\">
+                <div className=\"flex items-center gap-3 mb-5 relative z-10\">
+                  <div className=\"w-10 h-10 rounded-lg bg-surface-container-highest border border-outline-variant/15 flex items-center justify-center\">
+                    <span className={`material-symbols-outlined text-lg ${insight.colorClass}`}>{insight.icon}</span>
                   </div>
-                  <div>
-                    <h4 className="text-base font-semibold text-white/90 group-hover:text-white transition-colors">{factor.name}</h4>
-                    <p className="text-xs text-white/40 mt-0.5">{factor.impact}</p>
-                  </div>
-                </div>
-                <div 
-                  className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 backdrop-blur-sm"
-                  style={{ color: factor.color }}
-                >
-                  <span className="text-sm font-bold">{factor.percentage}%</span>
+                  <h4 className=\"text-base font-bold text-on-surface\">{insight.factor}</h4>
                 </div>
               </div>
-
-              <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden mb-5">
-                <div 
-                  className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ease-out origin-left group-hover:scale-x-[1.02]"
-                  style={{ 
-                    width: `${factor.percentage}%`, 
-                    backgroundColor: factor.color,
-                    boxShadow: `0 0 10px ${factor.color}` 
-                  }}
-                />
-              </div>
-
-              <div className="h-[60px] w-full mt-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                <Line data={chartData} options={chartOptions} />
-              </div>
-            </article>
-          );
-        })}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 };
 
-export default ScoreBreakdown;
+export default ScoreAnalysis;
+"""
+
+try:
+    if "exact content.txt" not in content_score_breakdown:
+        with open(file1, "w", encoding="utf-8") as f:
+            f.write(content_score_breakdown)
+            
+    with open(file2, "w", encoding="utf-8") as f:
+        f.write(content_speedometer)
+        
+    with open(file3, "w", encoding="utf-8") as f:
+        f.write(content_analysis)
+        
+    print("Files successfully overwritten using theme-system semantic utility classes!")
+except Exception as e:
+    print(f"Error: {e}")
+'
+```
+
+If you prefer applying the final `content.txt` logic automatically directly through this script, just replace the placeholder `content_score_breakdown` text section in the script with the raw file payload, and execute!
