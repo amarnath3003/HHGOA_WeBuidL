@@ -77,6 +77,9 @@ class EtherScoreAPIHandler(BaseHTTPRequestHandler):
         except ValueError as exc:
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
             return
+        except RuntimeError as exc:
+            self._send_json(HTTPStatus.BAD_GATEWAY, {"error": str(exc)})
+            return
 
         self._send_json(HTTPStatus.OK, result)
 
