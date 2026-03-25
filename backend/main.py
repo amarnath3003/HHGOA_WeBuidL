@@ -1,103 +1,125 @@
-import os
-import pandas as pd
-import nada_numpy as na
-import nada_numpy.client as na_client
-import py_nillion_client as nillion
-from sklearn.linear_model import LinearRegression
-from dotenv import load_dotenv
-from nada_ai.client import SklearnClient
-from common.utils import compute, store_program, store_secrets
-import requests
+from __future__ import annotations
+
+import argparse
+from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
+from urllib.parse import urlparse
 
-# Load environment variables
-load_dotenv()
+try:
+    from .data_processing import build_score_payload
+except ImportError:
+    from data_processing import build_score_payload
 
-# Load your training data
-df_train = pd.read_csv('usdt_data_cleaned.csv')
 
-# Define features and target variable for training
-X_train = df_train[['balance_in_usdt', 'tokenBalance', 'total_nfts']]
-y_train = df_train['target_variable']
+class EtherScoreAPIHandler(BaseHTTPRequestHandler):
+    server_version = "EtherScoreAPI/1.0"
 
-# Initialize Nillion client
-cluster_id = os.getenv("NILLION_CLUSTER_ID")
-grpc_endpoint = os.getenv("GRPC_ENDPOINT")
-client = SklearnClient(cluster_id=cluster_id, grpc_endpoint=grpc_endpoint)
+    def do_OPTIONS(self) -> None:
+        self._send_json(HTTPStatus.NO_CONTENT, {})
 
-# Create and train the linear regression model
-model = LinearRegression()
-model.fit(X_train, y_train)
+    def do_GET(self) -> None:
+        parsed = urlparse(self.path)
+        path = parsed.path.rstrip("/") or "/"
 
-# Function to fetch test data from The Graph protocol
-def fetch_test_data():
-    # Define the endpoint and query for fetching test data
-    endpoint = "https://gateway.thegraph.com/api/your-endpoint/subgraphs/id/your-subgraph-id"
-    query = """
-    {
-      accounts(where: {id: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045") {
-        id
-        balances(where: {token_: {symbol: "USDT"}}) {
-          balance
-          token {
-            decimals
-          }
-        }
-        tokenHolders {
-          tokenBalance
-        }
-        holdings {
-          collection {
-            symbol
-          }
-        }
-      }
-    }
-    """
-    response = requests.post(endpoint, json={'query': query})
-    if response.status_code == 200:
-        data = response.json()
-        # Process and return the data
-        return process_test_data(data)
-    else:
-        print(f"Failed to fetch test data: {response.status_code}")
-        return None
+        if path in {"/", "/api"}:
+            self._send_json(
+                HTTPStatus.OK,
+                {
+                    "service": "EtherScore backend",
+                    "status": "ok",
+                    "endpoints": {
+                        "health": "GET /api/health",
+                        "score_post": "POST /api/score",
+                        "score_get": "GET /api/score/<wallet_address>",
+                    },
+                },
+            )
+            return
 
-def process_test_data(data):
-    # Process the fetched data into a DataFrame similar to the training data
-    accounts = data['data']['accounts']
-    rows = []
-    for account in accounts:
-        balance_in_usdt = sum(
-            int(balance['balance']) / (10 ** int(balance['token']['decimals']))
-            for balance in account['balances']
-        )
-        token_balance = sum(
-            float(holder['tokenBalance'])
-            for holder in account['tokenHolders']
-        )
-        total_nfts = len(account['holdings'])
-        rows.append({
-            'account_id': account['id'],
-            'balance_in_usdt': balance_in_usdt,
-            'tokenBalance': token_balance,
-            'total_nfts': total_nfts
-        })
-    return pd.DataFrame(rows)
+        if path == "/api/health":
+            self._send_json(HTTPStatus.OK, {"status": "ok"})
+            return
 
-# Fetch and process the test data
-df_test = fetch_test_data()
+        if path.startswith("/api/score/"):
+            address = path.split("/api/score/", 1)[1]
+            self._handle_score_request(address)
+            return
 
-# Define features for testing
-X_test = df_test[['balance_in_usdt', 'tokenBalance', 'total_nfts']]
+        self._send_json(HTTPStatus.NOT_FOUND, {"error": "Route not found."})
 
-# Predict using the trained model
-predictions = model.predict(X_test)
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        path = parsed.path.rstrip("/") or "/"
 
-# Add predictions to the test DataFrame
-df_test['predicted_target'] = predictions
+        if path != "/api/score":
+            self._send_json(HTTPStatus.NOT_FOUND, {"error": "Route not found."})
+            return
 
-# Save the predictions to a CSV file
-df_test.to_csv('usdt_data_predictions.csv', index=False)
+        payload = self._read_json_body()
+        address = str(payload.get("address", "")).strip()
+        self._handle_score_request(address)
 
-print("Model training complete and predictions saved to 'usdt_data_predictions.csv'.")
+    def log_message(self, format: str, *args: object) -> None:
+        return
+
+    def _handle_score_request(self, address: str) -> None:
+        if not address:
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Request body must include an address field."})
+            return
+
+        try:
+            result = build_score_payload(address)
+        except ValueError as exc:
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+            return
+
+        self._send_json(HTTPStatus.OK, result)
+
+    def _read_json_body(self) -> dict[str, object]:
+        content_length = int(self.headers.get("Content-Length", "0"))
+        if content_length <= 0:
+            return {}
+
+        raw_body = self.rfile.read(content_length)
+        if not raw_body:
+            return {}
+
+        try:
+            return json.loads(raw_body.decode("utf-8"))
+        except json.JSONDecodeError:
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Request body must be valid JSON."})
+            return {}
+
+    def _send_json(self, status: HTTPStatus, payload: dict[str, object]) -> None:
+        body = b"" if status == HTTPStatus.NO_CONTENT else json.dumps(payload).encode("utf-8")
+        self.send_response(status.value)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+
+        if body:
+            self.wfile.write(body)
+
+
+def run_server(host: str, port: int) -> None:
+    server = ThreadingHTTPServer((host, port), EtherScoreAPIHandler)
+    print(f"EtherScore backend listening on http://{host}:{port}")
+    print("Available routes: GET /api/health, POST /api/score, GET /api/score/<wallet_address>")
+    server.serve_forever()
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the EtherScore backend API.")
+    parser.add_argument("--host", default=os.getenv("ETHERSCORE_HOST", "127.0.0.1"))
+    parser.add_argument("--port", type=int, default=int(os.getenv("ETHERSCORE_PORT", "8000")))
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    arguments = parse_args()
+    run_server(arguments.host, arguments.port)

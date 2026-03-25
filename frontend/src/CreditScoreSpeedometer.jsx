@@ -81,8 +81,8 @@ const CreditScoreSpeedometer = ({ score }) => {
             stroke="currentColor"
             strokeWidth="16"
             strokeLinecap="round"
-            strokeDasharray="\\ \\"
-            transform="\otate(\ 150 150)\"
+            strokeDasharray={`${arcLength} ${gap}`}
+            transform={`rotate(${startAngle} 150 150)`}
             className="text-surface-container-highest"
           />
 
@@ -94,12 +94,12 @@ const CreditScoreSpeedometer = ({ score }) => {
             stroke="url(#scoreGlow)"
             strokeWidth="16"
             strokeLinecap="round"
-            strokeDasharray="\\ \\"
+            strokeDasharray={`${circumference} ${circumference}`}
             style={{ 
               strokeDashoffset: dashoffset,
               transition: 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)' 
             }}
-            transform="\otate(\ 150 150)\"
+            transform={`rotate(${startAngle} 150 150)`}
             filter="url(#neonGlow)"
           />
         </svg>
@@ -110,17 +110,17 @@ const CreditScoreSpeedometer = ({ score }) => {
           
           <div className="relative z-10 flex flex-col items-center mt-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <span className="\w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)] \\"></span>
+              <span className={`w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)] ${band.colorClass}`}></span>
               <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.25em] text-on-surface-variant uppercase">Credit Score</span>
             </div>
             
-            <div className="text-7xl sm:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-primary to-tertiary drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] mb-2">
+            <div className={`text-7xl sm:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-primary to-tertiary drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] mb-2`}>
               {score}
             </div>
             
             <div className="flex items-center gap-2 mt-2">
                <span 
-                 className="\ounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container border border-outline-variant/15 backdrop-blur-sm \\"
+                 className={`rounded-lg px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest bg-surface-container border border-outline-variant/15 backdrop-blur-sm ${band.colorClass}`}
                >
                  {band.label}
                </span>

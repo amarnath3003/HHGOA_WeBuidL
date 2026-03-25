@@ -7,10 +7,15 @@ import ScoreBreakdown from './ScoreBreakdown.jsx';
 import ScoreAnalysis from './ScoreAnalysis.jsx';
 import './App.css';
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
 function App() {
   const [web3, setWeb3] = useState(null);
   const [address, setAddress] = useState('');
   const [creditScore, setCreditScore] = useState(null);
+  const [walletData, setWalletData] = useState(null);
+  const [isLoadingScore, setIsLoadingScore] = useState(false);
+  const [scoreError, setScoreError] = useState('');
 
   useEffect(() => {
     const init = async () => {
@@ -32,6 +37,7 @@ function App() {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const accounts = await web3.eth.getAccounts();
         setAddress(accounts[0]);
+        setScoreError('');
       } catch (error) {
         console.error("User denied account access");
       }
@@ -40,9 +46,37 @@ function App() {
     }
   };
 
-  const getCreditScore = () => {
-    const score = Math.floor(Math.random() * (850 - 300 + 1)) + 300;
-    setCreditScore(score);
+  const getCreditScore = async () => {
+    if (!address) {
+      return;
+    }
+
+    setIsLoadingScore(true);
+    setScoreError('');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || 'Unable to calculate credit score.');
+      }
+
+      setCreditScore(payload.score);
+      setWalletData(payload);
+    } catch (error) {
+      setScoreError(error.message || 'Unable to calculate credit score.');
+      setCreditScore(null);
+      setWalletData(null);
+    } finally {
+      setIsLoadingScore(false);
+    }
   };
 
   return (
@@ -90,11 +124,20 @@ function App() {
             <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <button
                 onClick={getCreditScore}
+                disabled={isLoadingScore}
                 className="relative overflow-hidden group w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-white transition-all text-background font-bold tracking-wide hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(177,197,255,0.4)] active:scale-95 active:translate-y-0 duration-300"
               >
                 <div className="absolute inset-0 w-full h-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-                <span className="relative z-10">{creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}</span>
+                <span className="relative z-10">
+                  {isLoadingScore ? 'Calculating Score...' : creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
+                </span>
               </button>
+            </section>
+          )}
+
+          {scoreError && (
+            <section className="max-w-2xl mx-auto text-center">
+              <p className="rounded-xl border border-[#ffb4ab]/30 bg-[#ffb4ab]/10 px-4 py-3 text-sm text-[#ffb4ab]">{scoreError}</p>
             </section>
           )}
 
@@ -113,11 +156,11 @@ function App() {
               <section className="grid grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
                 <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
-                  <div className="text-lg font-bold text-on-surface">$45,230</div>
+                  <div className="text-lg font-bold text-on-surface">{walletData?.summary?.total_assets_display || '$0.00'}</div>
                 </div>
                 <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
-                  <div className="text-lg font-bold text-tertiary-fixed-dim">High</div>
+                  <div className="text-lg font-bold text-tertiary-fixed-dim">{walletData?.trust_level || 'Pending'}</div>
                 </div>
               </section>
 
@@ -129,12 +172,12 @@ function App() {
 
               <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
                 <div className="lg:col-span-8 space-y-8">
-                  <ScoreBreakdown />
+                  <ScoreBreakdown factors={walletData?.factors} />
                   <ScoreAnalysis score={creditScore} />
                 </div>
 
                 <aside className="lg:col-span-4 space-y-8 lg:sticky lg:top-28">
-                  <WalletSummary />
+                  <WalletSummary summary={walletData?.summary} featuredCollections={walletData?.featured_collections} />
                 </aside>
               </section>
             </>
