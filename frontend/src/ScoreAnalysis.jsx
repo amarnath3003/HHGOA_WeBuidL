@@ -1,15 +1,16 @@
 import React from 'react';
 
 const ScoreAnalysis = ({ score }) => {
-  const insights = [
-    { factor: 'Wallet Balance', impact: 'High', suggestion: 'Maintain a stable balance to improve your score.', icon: '💰' },
-    { factor: 'Transaction History', impact: 'Medium', suggestion: 'Increase your transaction frequency for a better score.', icon: '📊' },
-    { factor: 'NFT Holdings', impact: 'Low', suggestion: 'Diversify your NFT portfolio to potentially boost your score.', icon: '🖼️' },
-  ];
-
   const averageScore = 720;
   const delta = score - averageScore;
   const percentile = Math.max(1, Math.min(99, Math.round(((score - 300) / 550) * 100)));
+  
+  const insights = [
+    { factor: 'Wallet Balance', impact: 'High', suggestion: 'Maintain a stable balance to improve your score.', icon: 'account_balance_wallet', color: '#ffb4ab', glow: 'rgba(255, 180, 171, 0.3)' },
+    { factor: 'Transaction History', impact: 'Medium', suggestion: 'Increase your transaction frequency for a better score.', icon: 'history', color: '#cdbdff', glow: 'rgba(205, 189, 255, 0.3)' },
+    { factor: 'NFT Holdings', impact: 'Low', suggestion: 'Diversify your NFT portfolio to potentially boost your score.', icon: 'token', color: '#a6e6ff', glow: 'rgba(166, 230, 255, 0.3)' },
+  ];
+
   const benchmarkLadder = [
     { label: 'Top 10%', value: 790 },
     { label: 'Top 25%', value: 760 },
@@ -17,183 +18,236 @@ const ScoreAnalysis = ({ score }) => {
     { label: 'Bottom 25%', value: 640 },
   ];
 
-  const getImpactBadge = (impact) => {
-    if (impact === 'High') {
-      return 'bg-error/20 text-error';
-    }
-    if (impact === 'Medium') {
-      return 'bg-tertiary-container/20 text-tertiary';
-    }
-    return 'bg-secondary-container/20 text-secondary';
-  };
+  const deltaColor = delta >= 0 ? '#a6e6ff' : '#ffb4ab';
+  const deltaGlow = delta >= 0 ? 'rgba(166, 230, 255, 0.4)' : 'rgba(255, 180, 171, 0.4)';
 
   return (
-    <section className="rounded-xl bg-surface-container-high p-6 md:p-7 ghost-border">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+    <section className="relative rounded-2xl bg-[#0f1115]/80 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+      {/* Decorative background blurs */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#cdbdff]/5 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#a6e6ff]/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
-          <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-on-surface-variant">Score Analysis</p>
-          <h3 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">Peer & Risk Intelligence</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-[#cdbdff] text-sm">psychology</span>
+            <p className="text-xs font-mono uppercase tracking-[0.2em] text-[#cdbdff]/80">Score Analysis</p>
+          </div>
+          <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+            Peer & Risk Intelligence
+          </h3>
         </div>
-        <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-tertiary">Comparative Engine</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+          <span className="material-symbols-outlined text-[14px] text-[#cdbdff]">compare_arrows</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/70">Comparative Engine</span>
+        </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10 mb-10">
         {/* Percentile Rank */}
-        <div className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-surface-container-low to-surface-container p-5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-white/5 cursor-default">
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-tertiary-container/10 rounded-full blur-2xl group-hover:bg-tertiary-container/30 transition-colors duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-1.5 mb-2">
-                <span className="material-symbols-outlined text-[14px]">leaderboard</span> Percentile Rank
-              </p>
-              <div className="flex items-baseline gap-1 mt-1">
-                <p className="text-4xl font-extrabold tracking-tight ai-shimmer drop-shadow-sm">{percentile}</p>
-                <span className="text-sm font-bold text-tertiary-fixed-dim">%</span>
+        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#cdbdff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-6 border border-white/5 overflow-hidden">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-[#cdbdff]/20 rounded-full blur-2xl group-hover:bg-[#cdbdff]/30 transition-colors duration-500"></div>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-2 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px] text-[#cdbdff]">leaderboard</span> Percentile Rank
+                </p>
+                <div className="flex items-baseline gap-1 mt-2">
+                  <p className="text-4xl font-extrabold tracking-tight text-white drop-shadow-[0_0_15px_rgba(205,189,255,0.3)]">{percentile}</p>
+                  <span className="text-sm font-bold text-[#cdbdff]">%</span>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 backdrop-blur-md group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-[#cdbdff]" style={{fontVariationSettings: "'FILL' 1"}}>group</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-white/5 shadow-inner">
-               <span className="material-symbols-outlined text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>group</span>
-            </div>
+            <p className="text-xs text-white/40 mt-4 font-medium tracking-wide">Top tier against wallet cohort</p>
           </div>
-          <p className="text-xs text-on-surface-variant mt-3 relative z-10 font-medium tracking-wide">Top tier against wallet cohort</p>
         </div>
 
         {/* Peer Delta */}
-        <div className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-surface-container-low to-surface-container p-5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-white/5 cursor-default">
-          <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl transition-colors duration-500 ${delta >= 0 ? 'bg-secondary/10 group-hover:bg-secondary/20' : 'bg-error/10 group-hover:bg-error/20'}`}></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-1.5 mb-2">
-                <span className="material-symbols-outlined text-[14px]">compare_arrows</span> Peer Delta
-              </p>
-              <div className="flex items-baseline gap-1 mt-1">
-                <p className={`text-4xl font-extrabold tracking-tight drop-shadow-sm ${delta >= 0 ? 'text-secondary' : 'text-error'}`}>{delta >= 0 ? `+${delta}` : delta}</p>
+        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
+          <div className={`absolute inset-0 bg-gradient-to-br ${delta >= 0 ? 'from-[#a6e6ff]/10' : 'from-[#ffb4ab]/10'} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-6 border border-white/5 overflow-hidden">
+            <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl transition-colors duration-500 ${delta >= 0 ? 'bg-[#a6e6ff]/20 group-hover:bg-[#a6e6ff]/30' : 'bg-[#ffb4ab]/20 group-hover:bg-[#ffb4ab]/30'}`}></div>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-2 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px]" style={{color: deltaColor}}>compare_arrows</span> Peer Delta
+                </p>
+                <div className="flex items-baseline gap-1 mt-2">
+                  <p className="text-4xl font-extrabold tracking-tight" style={{ color: deltaColor, textShadow: `0 0 15px ${deltaGlow}` }}>
+                    {delta >= 0 ? `+${delta}` : delta}
+                  </p>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 backdrop-blur-md group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined" style={{color: deltaColor, fontVariationSettings: "'FILL' 1"}}>{delta >= 0 ? 'trending_up' : 'trending_down'}</span>
               </div>
             </div>
-             <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-white/5 shadow-inner">
-               <span className={`material-symbols-outlined ${delta >= 0 ? 'text-secondary' : 'text-error'}`} style={{fontVariationSettings: "'FILL' 1"}}>{delta >= 0 ? 'trending_up' : 'trending_down'}</span>
-            </div>
+            <p className="text-xs text-white/40 mt-4 font-medium tracking-wide">Vs avg wallet score ({averageScore})</p>
           </div>
-          <p className="text-xs text-on-surface-variant mt-3 relative z-10 font-medium tracking-wide">Vs average wallet score ({averageScore})</p>
         </div>
 
         {/* Risk Regime */}
-        <div className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-surface-container-low to-surface-container p-5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-white/5 cursor-default">
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors duration-500"></div>
-          <div className="flex items-start justify-between relative z-10">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant flex items-center gap-1.5 mb-2">
-                <span className="material-symbols-outlined text-[14px]">monitoring</span> Risk Regime
-              </p>
-              <div className="flex items-baseline gap-1 mt-1">
-                <p className="text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">Stable</p>
+        <div className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#b1c5ff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="relative h-full rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-6 border border-white/5 overflow-hidden">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-[#b1c5ff]/20 rounded-full blur-2xl group-hover:bg-[#b1c5ff]/30 transition-colors duration-500"></div>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/50 mb-2 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px] text-[#b1c5ff]">monitoring</span> Risk Regime
+                </p>
+                <div className="flex items-baseline gap-1 mt-2">
+                  <p className="text-3xl font-extrabold tracking-tight text-white drop-shadow-[0_0_15px_rgba(177,197,255,0.3)]">Stable</p>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 backdrop-blur-md group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-[#b1c5ff]" style={{fontVariationSettings: "'FILL' 1"}}>shield</span>
               </div>
             </div>
-             <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center border border-white/5 shadow-inner">
-               <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>shield</span>
+            <div className="mt-5 relative z-10 flex items-center gap-3">
+              <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden shadow-inner">
+                <div className="h-full bg-[#b1c5ff] rounded-full w-[85%] shadow-[0_0_8px_rgba(177,197,255,0.8)]"></div>
+              </div>
+              <p className="text-[9px] text-[#b1c5ff] font-bold uppercase tracking-[0.2em] whitespace-nowrap">Low Drift</p>
             </div>
-          </div>
-          <div className="mt-4 relative z-10 flex items-center gap-3">
-            <div className="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
-               <div className="h-full bg-primary rounded-full w-[85%]"></div>
-            </div>
-            <p className="text-[9px] text-on-surface-variant font-bold uppercase tracking-[0.2em] whitespace-nowrap">Low Drift</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Factor Insights</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-3">
+      {/* Factor Insights */}
+      <div className="relative z-10 mb-10">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="material-symbols-outlined text-white/40 text-sm">lightbulb</span>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-white/60">Factor Insights</h3>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {insights.map((insight, index) => (
-            <article key={index} className="group bg-surface-container-low rounded-lg p-5 hover:bg-surface-container hover:-translate-y-1 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-white/5 cursor-default">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl leading-none group-hover:scale-110 transition-transform duration-300">{insight.icon}</span>
-                <div className="text-lg font-semibold leading-tight group-hover:text-white transition-colors">{insight.factor}</div>
+            <div key={index} className="group relative rounded-xl bg-gradient-to-br from-white/[0.08] to-transparent p-[1px] overflow-hidden transition-transform hover:-translate-y-1">
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+                style={{ background: `linear-gradient(to bottom right, ${insight.glow}, transparent)` }}
+              ></div>
+              <div className="relative h-full flex flex-col rounded-xl bg-[#13151a]/90 backdrop-blur-sm p-6 border border-white/5 overflow-hidden">
+                <div 
+                  className="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" 
+                  style={{ backgroundColor: insight.color }}
+                ></div>
+                
+                <div className="flex items-center gap-3 mb-5 relative z-10">
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <span className="material-symbols-outlined text-[20px]" style={{ color: insight.color }}>{insight.icon}</span>
+                  </div>
+                  <h4 className="text-base font-bold text-white/90 group-hover:text-white transition-colors">{insight.factor}</h4>
+                </div>
+                
+                <div className="mt-auto relative z-10">
+                  <div 
+                    className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/5 border border-white/10 backdrop-blur-sm mb-3"
+                    style={{ color: insight.color, boxShadow: `0 0 10px ${insight.glow}` }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: insight.color, boxShadow: `0 0 5px ${insight.color}` }}></span>
+                    Impact: {insight.impact}
+                  </div>
+                  <p className="text-xs text-white/40 leading-relaxed font-medium tracking-wide group-hover:text-white/60 transition-colors">{insight.suggestion}</p>
+                </div>
               </div>
-              <div className={`inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold ${getImpactBadge(insight.impact)}`}>
-                  Impact: {insight.impact}
-              </div>
-              <p className="text-sm text-on-surface-variant mt-3 leading-relaxed">{insight.suggestion}</p>
-            </article>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-10">
+      {/* Peer Comparison */}
+      <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">Peer Comparison</h3>
-          <span className="px-2.5 py-1 rounded-full bg-surface-container-highest text-[10px] font-mono text-on-surface-variant uppercase tracking-widest border border-white/5">Global Network</span>
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-white/40 text-sm">lan</span>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white/60">Peer Comparison</h3>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)] animate-pulse"></span>
+            <span className="text-[9px] font-mono text-white/70 uppercase tracking-widest">Global Network</span>
+          </div>
         </div>
         
-        <div className="bg-gradient-to-b from-surface-container-low/80 to-surface-container-low/30 rounded-2xl p-6 border border-white/5 relative overflow-hidden group hover:border-white/10 transition-colors duration-500">
-          {/* Subtle noise/grid background */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg==')] opacity-50"></div>
+        <div className="rounded-2xl bg-gradient-to-b from-[#171920]/80 to-[#13151a]/40 p-6 sm:p-8 border border-white/[0.08] relative overflow-hidden group hover:border-white/[0.15] transition-colors duration-500">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMSkiLz48L3N2Zz4=')]"></div>
           
           <div className="relative z-10">
-            {/* Visual Header */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="flex flex-col items-center justify-center p-5 rounded-xl bg-surface-container-highest/50 backdrop-blur-md border border-white/5 shadow-inner hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(166,230,255,0.15)] transition-all duration-300">
-                <span className="text-secondary text-5xl md:text-6xl font-black tracking-tighter drop-shadow-lg scale-100">{score}</span>
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mt-2 font-bold">Your Score</span>
+            {/* Visual Head-to-Head */}
+            <div className="grid grid-cols-2 gap-4 md:gap-8 mb-10">
+              <div className="relative flex flex-col items-center justify-center p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md shadow-inner transition-transform duration-300 hover:scale-[1.02] hover:bg-white/[0.04]">
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-[#a6e6ff]/10 rounded-full blur-xl"></div>
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40 mb-3 font-bold">Your Score</span>
+                <span className="text-[#a6e6ff] text-5xl md:text-7xl font-black tracking-tighter drop-shadow-[0_0_25px_rgba(166,230,255,0.4)]">{score}</span>
               </div>
-              <div className="flex flex-col items-center justify-center p-5 rounded-xl bg-surface-container-highest/30 backdrop-blur-md border border-white/5 shadow-inner hover:-translate-y-1 transition-all duration-300">
-                <span className="text-primary text-5xl md:text-6xl font-black tracking-tighter drop-shadow-lg opacity-80">{averageScore}</span>
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mt-2 font-bold">Network Avg</span>
+              <div className="relative flex flex-col items-center justify-center p-6 rounded-2xl bg-black/20 border border-white/5 backdrop-blur-md shadow-inner transition-transform duration-300 hover:scale-[1.02] hover:bg-white/[0.02]">
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/30 mb-3 font-bold">Network Avg</span>
+                <span className="text-white/60 text-5xl md:text-7xl font-black tracking-tighter drop-shadow-md">{averageScore}</span>
               </div>
             </div>
 
             {/* Overlapping progress comparative layout */}
-            <div className="space-y-6 mb-8 pt-2">
+            <div className="space-y-6 mb-10">
               <div className="relative group/bar cursor-default">
-                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
-                  <span className="text-secondary flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(166,230,255,0.8)]"></span> You</span>
-                  <span className="text-secondary font-mono">{score}</span>
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest mb-2.5">
+                  <span className="text-[#a6e6ff] flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#a6e6ff] shadow-[0_0_10px_rgba(166,230,255,0.8)]"></span> You
+                  </span>
+                  <span className="text-[#a6e6ff] font-mono text-sm">{score}</span>
                 </div>
-                <div className="h-3 bg-surface-container-highest rounded-full overflow-hidden shadow-inner group-hover/bar:bg-surface-container-highest/80 transition-colors">
-                  <div className="h-full bg-gradient-to-r from-secondary-fixed-dim/50 to-secondary rounded-full transition-all duration-1000 ease-out relative" style={{ width: `${(score / 850) * 100}%` }}>
-                    <div className="absolute right-0 top-0 bottom-0 w-4 bg-white/30 blur-[2px]"></div>
+                <div className="h-4 bg-black/40 rounded-full overflow-hidden shadow-inner p-0.5 border border-white/[0.02]">
+                  <div className="h-full bg-gradient-to-r from-[#a6e6ff]/40 to-[#a6e6ff] rounded-full transition-all duration-1000 ease-out relative shadow-[0_0_15px_rgba(166,230,255,0.5)]" style={{ width: `${(score / 850) * 100}%` }}>
+                    <div className="absolute right-1 top-1 bottom-1 w-2 rounded-full bg-white/80 blur-[1px]"></div>
                   </div>
                 </div>
               </div>
 
               <div className="relative group/bar cursor-default">
-                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider mb-2">
-                   <span className="text-primary flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_rgba(177,197,255,0.8)] opacity-70"></span> Average</span>
-                  <span className="text-primary font-mono">{averageScore}</span>
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest mb-2.5">
+                   <span className="text-white/50 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-white/20"></span> Average
+                  </span>
+                  <span className="text-white/50 font-mono text-sm">{averageScore}</span>
                 </div>
-                <div className="h-3 bg-surface-container-highest rounded-full overflow-hidden shadow-inner opacity-60 group-hover/bar:opacity-80 transition-opacity">
-                  <div className="h-full bg-gradient-to-r from-primary-fixed-dim/50 to-primary rounded-full transition-all duration-1000 ease-out" style={{ width: `${(averageScore / 850) * 100}%` }}></div>
+                <div className="h-4 bg-black/40 rounded-full overflow-hidden shadow-inner p-0.5 border border-white/[0.02]">
+                  <div className="h-full bg-gradient-to-r from-white/10 to-white/30 rounded-full transition-all duration-1000 ease-out" style={{ width: `${(averageScore / 850) * 100}%` }}></div>
                 </div>
               </div>
             </div>
 
             {/* Premium Benchmark Ladder */}
-            <div className="pt-6 border-t border-white/5">
-              <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-on-surface-variant mb-4 flex items-center gap-2">
+            <div className="pt-8 border-t border-white/[0.08]">
+              <h4 className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/40 mb-5 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[14px]">format_list_numbered</span>
                 Cohort Distribution
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {benchmarkLadder.map((row) => {
                   const isCurrentTier = score >= row.value;
                   return (
-                    <div key={row.label} className={`group/row flex items-center justify-between p-3 rounded-lg border transition-all duration-300 ${isCurrentTier ? 'bg-secondary/5 border-secondary/20 hover:border-secondary/40 shadow-sm' : 'bg-transparent border-transparent hover:bg-surface-container/50 cursor-default'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-1.5 h-6 rounded-full transition-colors ${isCurrentTier ? 'bg-secondary shadow-[0_0_8px_rgba(166,230,255,0.5)]' : 'bg-surface-container-highest group-hover/row:bg-white/20'}`}></div>
-                        <span className={`text-sm font-bold tracking-tight ${isCurrentTier ? 'text-on-surface' : 'text-on-surface-variant group-hover/row:text-on-surface transition-colors'}`}>{row.label}</span>
+                    <div key={row.label} className={`group/row relative flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300 overflow-hidden ${isCurrentTier ? 'bg-[#a6e6ff]/5 border-[#a6e6ff]/20 hover:border-[#a6e6ff]/40 shadow-sm' : 'bg-transparent border-transparent hover:bg-white/[0.02]'}`}>
+                      {isCurrentTier && <div className="absolute inset-0 bg-gradient-to-r from-[#a6e6ff]/0 via-[#a6e6ff]/5 to-[#a6e6ff]/0 animate-pulse pointer-events-none"></div>}
+                      
+                      <div className="flex items-center gap-3 relative z-10 w-1/3">
+                        <div className={`w-1.5 h-6 rounded-full transition-colors ${isCurrentTier ? 'bg-[#a6e6ff] shadow-[0_0_10px_rgba(166,230,255,0.6)]' : 'bg-white/10 group-hover/row:bg-white/20'}`}></div>
+                        <span className={`text-sm font-bold tracking-wide ${isCurrentTier ? 'text-white' : 'text-white/40 group-hover/row:text-white/60 transition-colors'}`}>{row.label}</span>
                       </div>
                       
-                      <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex w-24 md:w-32 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+                      <div className="flex items-center gap-6 justify-end relative z-10 flex-1">
+                        <div className="hidden sm:flex flex-1 max-w-[200px] h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/5">
                           <div
-                            className={`h-full rounded-full transition-all duration-1000 ease-out ${isCurrentTier ? 'bg-secondary' : 'bg-on-surface-variant/40'}`}
+                            className={`h-full rounded-full transition-all duration-1000 ease-out ${isCurrentTier ? 'bg-[#a6e6ff] shadow-[0_0_8px_rgba(166,230,255,0.8)]' : 'bg-white/20'}`}
                             style={{ width: `${(row.value / 850) * 100}%` }}
                           ></div>
                         </div>
-                        <div className="flex items-center gap-2 w-16 justify-end">
-                          <span className={`font-mono font-bold tracking-tight text-sm ${isCurrentTier ? 'text-secondary ai-shimmer drop-shadow-md' : 'text-on-surface-variant'}`}>{row.value}</span>
-                          {isCurrentTier && <span className="material-symbols-outlined text-sm text-secondary animate-pulse-glow" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>}
+                        <div className="flex items-center gap-2 min-w-[70px] justify-end">
+                          <span className={`font-mono font-bold tracking-tight text-base ${isCurrentTier ? 'text-[#a6e6ff] drop-shadow-[0_0_8px_rgba(166,230,255,0.5)]' : 'text-white/40'}`}>{row.value}</span>
+                          {isCurrentTier && <span className="material-symbols-outlined text-[18px] text-[#a6e6ff] drop-shadow-[0_0_8px_rgba(166,230,255,0.5)]" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>}
                         </div>
                       </div>
                     </div>
@@ -204,7 +258,6 @@ const ScoreAnalysis = ({ score }) => {
           </div>
         </div>
       </div>
-
     </section>
   );
 };
