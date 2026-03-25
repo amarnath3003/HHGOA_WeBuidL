@@ -280,6 +280,124 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
     return default
 
 
+def _model_dataset_path() -> Path:
+    configured = os.getenv("ETHERSCORE_CREDIT_MODEL_DATASET_PATH", "").strip()
+    if configured:
+        candidate = Path(configured).expanduser()
+        if not candidate.is_absolute():
+            candidate = (Path(__file__).resolve().parent / candidate).resolve()
+        return candidate
+
+    return Path(__file__).resolve().parent / "credit_scoring_dataset.csv"
+
+
+def _normalize_model_feature(value: float, min_val: float, max_val: float) -> float:
+    spread = max_val - min_val
+    if spread <= 1e-9:
+        return 0.0
+    norm = (value - min_val) / spread
+    return _clamp(norm, 0.0, 1.0)
+
+
+def _weighted_model_index(
+    wallet_features: dict[str, float],
+    weights: dict[str, float],
+    min_max_stats: dict[str, tuple[float, float]],
+) -> float:
+    return sum(
+        weights[column] * _normalize_model_feature(wallet_features[column], min_max_stats[column][0], min_max_stats[column][1])
+        for column in MODEL_FEATURE_COLUMNS
+    )
+
+
+def _fallback_credit_model() -> WeightedCreditModel:
+    return WeightedCreditModel(
+        weights=dict(MODEL_PRIOR_WEIGHTS),
+        min_max_stats=dict(MODEL_FALLBACK_MIN_MAX),
+        scale=MODEL_FALLBACK_SCALE,
+        intercept=MODEL_FALLBACK_INTERCEPT,
+    )
+
+
+def _feature_min_max(rows: list[dict[str, float]]) -> dict[str, tuple[float, float]]:
+    stats: dict[str, tuple[float, float]] = {}
+    for column in MODEL_FEATURE_COLUMNS:
+        values = [row[column] for row in rows]
+        stats[column] = (min(values), max(values))
+    return stats
+
+
+def _train_weighted_credit_model(rows: list[dict[str, float]]) -> WeightedCreditModel:
+    min_max_stats = _feature_min_max(rows)
+    x = [_weighted_model_index(row, MODEL_PRIOR_WEIGHTS, min_max_stats) for row in rows]
+    y = [row[MODEL_TARGET_COLUMN] for row in rows]
+
+    mean_x = sum(x) / len(x)
+    mean_y = sum(y) / len(y)
+    var_x = sum((value - mean_x) ** 2 for value in x)
+    cov_xy = sum((x_value - mean_x) * (y_value - mean_y) for x_value, y_value in zip(x, y))
+
+    scale = cov_xy / var_x if var_x > 1e-12 else 0.0
+    intercept = mean_y - (scale * mean_x)
+
+    return WeightedCreditModel(
+        weights=dict(MODEL_PRIOR_WEIGHTS),
+        min_max_stats=min_max_stats,
+        scale=scale,
+        intercept=intercept,
+    )
+
+
+def _load_model_rows(dataset_path: Path) -> list[dict[str, float]]:
+    if not dataset_path.exists():
+        return []
+
+    rows: list[dict[str, float]] = []
+    with dataset_path.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for csv_row in reader:
+            if not csv_row:
+                continue
+
+            parsed_row = {
+                "wallet_balance_usd": _safe_float(csv_row.get("wallet_balance_usd"), default=0.0),
+                "transaction_count": _safe_float(csv_row.get("transaction_count"), default=0.0),
+                "nft_ownership_volume": _safe_float(csv_row.get("nft_ownership_volume"), default=0.0),
+                "account_age_days": _safe_float(csv_row.get("account_age_days"), default=0.0),
+                "token_diversity": _safe_float(csv_row.get("token_diversity"), default=0.0),
+                "credit_score": _safe_float(csv_row.get("credit_score"), default=0.0),
+            }
+
+            if any(parsed_row[column] < 0 for column in MODEL_FEATURE_COLUMNS):
+                continue
+            if parsed_row[MODEL_TARGET_COLUMN] <= 0:
+                continue
+
+            rows.append(parsed_row)
+
+    return rows
+
+
+def _get_credit_model() -> WeightedCreditModel:
+    global _credit_model
+    if _credit_model is not None:
+        return _credit_model
+
+    dataset_path = _model_dataset_path()
+    rows = _load_model_rows(dataset_path)
+    if rows:
+        _credit_model = _train_weighted_credit_model(rows)
+    else:
+        _credit_model = _fallback_credit_model()
+    return _credit_model
+
+
+def _predict_credit_score(wallet_features: dict[str, float], model: WeightedCreditModel) -> int:
+    weighted_index = _weighted_model_index(wallet_features, model.weights, model.min_max_stats)
+    raw_score = model.intercept + (model.scale * weighted_index)
+    return int(round(_clamp(raw_score, 300.0, 850.0)))
+
+
 def _source_name(endpoint: str) -> str:
     if not endpoint:
         return "not configured"
