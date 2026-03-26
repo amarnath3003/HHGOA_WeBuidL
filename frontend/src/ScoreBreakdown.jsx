@@ -15,11 +15,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip,
 const toPercent = (factor) => {
   const normalized = Number(factor?.normalized_value);
   if (Number.isFinite(normalized)) {
-    return Math.max(0, Math.min(100, Math.round(normalized * 100)));
+    return Math.max(0, Math.min(100, normalized * 100));
   }
   const score = Number(factor?.score);
   if (Number.isFinite(score)) {
-    return Math.max(0, Math.min(100, Math.round(score)));
+    return Math.max(0, Math.min(100, score));
   }
   return 0;
 };
@@ -70,7 +70,7 @@ const buildAllTimeCurve = (factor, normalizedPercent, summary) => {
     const growth = Math.pow(ratio, growthExponent);
     const swing = Math.sin(ratio * 3.8 * Math.PI + phase) * (factorScore * volatility * (1 - ratio) * 0.35);
     const value = baseline + (factorScore * growth) + swing;
-    return Math.round(clamp(value, 0, 100));
+    return clamp(value, 0, 100);
   });
 };
 
@@ -87,38 +87,64 @@ const toSeries = (factor, normalizedPercent, summary) => {
   return buildAllTimeCurve(factor, normalizedPercent, summary);
 };
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    tooltip: {
-      enabled: true,
-      displayColors: false,
-      backgroundColor: 'rgba(31, 32, 32, 0.92)',
-      titleColor: '#e4e2e1',
-      bodyColor: '#c3c6d6',
-      callbacks: {
-        title: () => '',
-        label: (ctx) => `All-time level: ${Math.round(ctx.parsed.y)}`,
+const chartOptionsForSeries = (series) => {
+  const numericSeries = series.filter((point) => Number.isFinite(Number(point))).map(Number);
+  const minRaw = numericSeries.length ? Math.min(...numericSeries) : 0;
+  const maxRaw = numericSeries.length ? Math.max(...numericSeries) : 100;
+
+  const span = maxRaw - minRaw;
+  const minSpan = 8;
+  const padding = Math.max(1, span * 0.25);
+
+  let minY = clamp(minRaw - padding, 0, 100);
+  let maxY = clamp(maxRaw + padding, 0, 100);
+
+  if ((maxY - minY) < minSpan) {
+    const center = (maxY + minY) / 2;
+    minY = clamp(center - (minSpan / 2), 0, 100);
+    maxY = clamp(center + (minSpan / 2), 0, 100);
+    if ((maxY - minY) < minSpan) {
+      if (minY === 0) {
+        maxY = minSpan;
+      } else if (maxY === 100) {
+        minY = 100 - minSpan;
+      }
+    }
+  }
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        enabled: true,
+        displayColors: false,
+        backgroundColor: 'rgba(31, 32, 32, 0.92)',
+        titleColor: '#e4e2e1',
+        bodyColor: '#c3c6d6',
+        callbacks: {
+          title: () => '',
+          label: (ctx) => `All-time level: ${ctx.parsed.y.toFixed(2)}`,
+        },
+      },
+      legend: {
+        display: false,
       },
     },
-    legend: {
-      display: false,
+    scales: {
+      x: { display: false },
+      y: { display: false, min: minY, max: maxY },
     },
-  },
-  scales: {
-    x: { display: false },
-    y: { display: false, min: 0, max: 100 },
-  },
-  elements: {
-    line: { tension: 0.32, borderWidth: 2 },
-    point: { radius: 0, hoverRadius: 3, hitRadius: 8 },
-  },
-  interaction: {
-    mode: 'nearest',
-    axis: 'x',
-    intersect: false,
-  },
+    elements: {
+      line: { tension: 0.32, borderWidth: 2 },
+      point: { radius: 0, hoverRadius: 3, hitRadius: 8 },
+    },
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false,
+    },
+  };
 };
 
 const ScoreBreakdown = ({ factors, summary, warnings }) => {
@@ -193,6 +219,7 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
         {safeFactors.map((factor, index) => {
           const normalizedPercent = toPercent(factor);
           const series = toSeries(factor, normalizedPercent, summary);
+          const chartOptions = chartOptionsForSeries(series);
           const chartData = {
             labels: Array.from({ length: series.length }, () => ''),
             datasets: [
