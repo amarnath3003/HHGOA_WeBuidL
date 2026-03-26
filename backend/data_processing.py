@@ -483,8 +483,10 @@ class EthereumRpcClient:
     def get_token_diversity(self, address: str, *, has_activity: bool) -> int:
         try:
             result = self._call("alchemy_getTokenBalances", [address, "DEFAULT_TOKENS"], retries=0)
-        except ExternalServiceError:
-            return 1 if has_activity else 0
+        except ExternalServiceError as exc:
+            raise ExternalServiceError(
+                "Token diversity unavailable because provider does not support token balance index calls."
+            ) from exc
 
         balances = result.get("tokenBalances", []) if isinstance(result, dict) else []
         diversity_count = 0
@@ -494,8 +496,6 @@ class EthereumRpcClient:
             if _safe_int(entry.get("tokenBalance", "0x0")) > 0:
                 diversity_count += 1
 
-        if diversity_count <= 0 and has_activity:
-            return 1
         return diversity_count
 
     def _first_transfer_timestamp(self, address: str, *, outgoing: bool) -> datetime | None:
@@ -615,12 +615,20 @@ def _fetch_first_transaction_age_days_from_etherscan(address: str) -> int | None
 
 
 def _fetch_nft_snapshot(address: str, spec: ChainSpec) -> tuple[int, list[tuple[str, int]]]:
-    for endpoint in _nft_endpoint_candidates(spec):
+    endpoints = _nft_endpoint_candidates(spec)
+    if not endpoints:
+        raise ExternalServiceError(
+            f"Chain '{spec.name}' has no configured NFT API endpoint."
+        )
+
+    last_error: ExternalServiceError | None = None
+    for endpoint in endpoints:
         query = urlencode({"owner": address, "withMetadata": "false", "pageSize": "100"})
         url = f"{endpoint}?{query}"
         try:
             payload = _request_json(url, retries=0)
-        except ExternalServiceError:
+        except ExternalServiceError as exc:
+            last_error = exc
             continue
 
         total_count = _safe_int(payload.get("totalCount"), default=0)
@@ -650,7 +658,9 @@ def _fetch_nft_snapshot(address: str, spec: ChainSpec) -> tuple[int, list[tuple[
         ranked = sorted(collection_counts.items(), key=lambda item: item[1], reverse=True)
         return total_count, ranked[:3]
 
-    return 0, []
+    raise ExternalServiceError(
+        f"Chain '{spec.name}' NFT fetch failed for all configured providers."
+    ) from last_error
 
 
 def _fetch_ens_name(address: str) -> str | None:
