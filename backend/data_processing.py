@@ -882,31 +882,14 @@ def _build_featured_collections(snapshots: list[ChainSnapshot]) -> list[dict[str
     ranked_collections.sort(key=lambda item: item[2], reverse=True)
     featured: list[dict[str, Any]] = []
 
-    for index in range(3):
-        if index < len(ranked_collections):
-            chain_name, collection_name, quantity = ranked_collections[index]
-            estimated_value = round(max(quantity, 1) * NFT_FALLBACK_FLOOR_USD, 2)
-            featured.append(
-                {
-                    "name": collection_name,
-                    "tier": COLLECTION_TIERS[index % len(COLLECTION_TIERS)],
-                    "estimated_value_usd": estimated_value,
-                    "estimated_value_display": _format_currency(estimated_value),
-                    "accent": FACTOR_DEFINITIONS[index % len(FACTOR_DEFINITIONS)].color,
-                    "chain": chain_name,
-                }
-            )
-        else:
-            featured.append(
-                {
-                    "name": f"Collection {index + 1}",
-                    "tier": COLLECTION_TIERS[index % len(COLLECTION_TIERS)],
-                    "estimated_value_usd": 0.0,
-                    "estimated_value_display": "$0.00",
-                    "accent": FACTOR_DEFINITIONS[index % len(FACTOR_DEFINITIONS)].color,
-                    "chain": "n/a",
-                }
-            )
+    for chain_name, collection_name, quantity in ranked_collections[:10]:
+        featured.append(
+            {
+                "name": collection_name,
+                "chain": chain_name,
+                "quantity": max(quantity, 1),
+            }
+        )
 
     return featured
 
@@ -1048,7 +1031,9 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
     ens_name: str | None = None
 
     for snapshot in snapshots:
-        native_price = price_map.get(snapshot.chain, CHAIN_SPECS[snapshot.chain].fallback_price_usd)
+        native_price = price_map.get(snapshot.chain)
+        if native_price is None or native_price <= 0:
+            raise RuntimeError(f"Missing native USD price for chain '{snapshot.chain}'.")
         native_usd = snapshot.native_balance * native_price
 
         chain_breakdown[snapshot.chain] = {
@@ -1158,7 +1143,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
                 "value": _format_factor_value(factor, factor_raw_values[factor.name], unknown_age),
                 "score": factor_score,
                 "weighted_points": weighted_points,
-                "trend": _build_trend_series(f"{normalized_address}:{factor.name}", factor_score),
+                "trend": [],
                 "normalized_value": round(normalized_value, 4),
                 "rationale": _factor_rationale(factor.name, normalized_value),
             }
@@ -1199,9 +1184,9 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         "score_band": _score_band(score),
         "trust_level": _trust_level(score),
         "risk_regime": _risk_regime(score, volatility_index),
-        "average_score": AVERAGE_SCORE,
-        "peer_delta": score - AVERAGE_SCORE,
-        "percentile": _percentile(score),
+        "average_score": model.average_score,
+        "peer_delta": score - model.average_score,
+        "percentile": _percentile_from_reference(score, model.reference_scores),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "summary": summary,
         "factors": factors,
