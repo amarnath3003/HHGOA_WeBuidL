@@ -707,13 +707,16 @@ def _fetch_ens_name(address: str) -> str | None:
     return None
 
 
-def _get_native_prices_usd() -> dict[str, float]:
+def _get_native_prices_usd(required_chains: Sequence[str] | None = None) -> dict[str, float]:
     global _price_cache
     now = datetime.now(timezone.utc)
+    required = list(required_chains) if required_chains else list(CHAIN_SPECS.keys())
 
     if _price_cache is not None:
         cached_at, cached_prices = _price_cache
-        if (now - cached_at).total_seconds() < PRICE_CACHE_TTL_SECONDS:
+        if (now - cached_at).total_seconds() < PRICE_CACHE_TTL_SECONDS and all(
+            _safe_float(cached_prices.get(chain), default=0.0) > 0.0 for chain in required
+        ):
             return dict(cached_prices)
 
     prices: dict[str, float] = {}
@@ -722,11 +725,16 @@ def _get_native_prices_usd() -> dict[str, float]:
         for chain_name, spec in CHAIN_SPECS.items():
             raw_price = payload.get(spec.price_key, {}).get("usd") if isinstance(payload.get(spec.price_key), dict) else None
             parsed_price = _safe_float(raw_price, default=0.0)
-            if parsed_price <= 0:
-                raise ExternalServiceError(
-                    f"Price feed missing/invalid USD value for chain '{chain_name}' from {ETH_PRICE_API_URL}."
-                )
-            prices[chain_name] = parsed_price
+            if parsed_price > 0:
+                prices[chain_name] = parsed_price
+
+        missing = [chain for chain in required if _safe_float(prices.get(chain), default=0.0) <= 0.0]
+        if missing:
+            raise ExternalServiceError(
+                "Price feed missing/invalid USD values for chains: "
+                + ", ".join(missing)
+                + f" from {ETH_PRICE_API_URL}."
+            )
     except ExternalServiceError:
         raise
     except Exception as exc:
@@ -1055,7 +1063,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
             "Check RPC configuration or upstream provider health."
         )
 
-    price_map = _get_native_prices_usd()
+    price_map = _get_native_prices_usd(requested_chains)
     total_native_usd = 0.0
     total_usdt = 0.0
     total_transactions = 0
