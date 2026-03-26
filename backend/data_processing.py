@@ -847,11 +847,13 @@ def _fetch_chain_snapshot(address: str, chain: str) -> ChainSnapshot:
     has_activity = bool(native_balance > 0 or usdt_balance > 0 or transaction_count > 0)
     token_diversity = rpc_client.get_token_diversity(address, has_activity=has_activity)
 
-    account_age_days: int | None = None
-    if spec.supports_etherscan_age:
-        account_age_days = rpc_client.get_account_age_days(address)
-        if account_age_days is None:
-            account_age_days = _fetch_first_transaction_age_days_from_etherscan(address)
+    account_age_days = rpc_client.get_account_age_days(address)
+    if account_age_days is None and spec.supports_etherscan_age:
+        account_age_days = _fetch_first_transaction_age_days_from_etherscan(address)
+    if account_age_days is None:
+        raise ExternalServiceError(
+            f"Chain '{chain}' account age could not be determined from configured providers."
+        )
 
     nft_count, collections = _fetch_nft_snapshot(address, spec)
     ens_name = _fetch_ens_name(address) if spec.supports_ens else None
