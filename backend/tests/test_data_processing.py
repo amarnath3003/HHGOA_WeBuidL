@@ -132,6 +132,8 @@ def test_credit_score_uses_model_prediction(monkeypatch: pytest.MonkeyPatch) -> 
         },
         scale=500.0,
         intercept=350.0,
+        average_score=610,
+        reference_scores=(420.0, 510.0, 610.0, 710.0, 820.0),
     )
     captured_features: dict[str, float] = {}
 

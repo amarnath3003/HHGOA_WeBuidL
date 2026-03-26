@@ -172,8 +172,8 @@ function App() {
 
               <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
                 <div className="lg:col-span-8 space-y-8">
-                  <ScoreBreakdown factors={walletData?.factors} />
-                  <ScoreAnalysis score={creditScore} />
+                  <ScoreBreakdown factors={walletData?.factors} summary={walletData?.summary} warnings={walletData?.meta?.warnings} />
+                  <ScoreAnalysis payload={walletData} />
                 </div>
 
                 <aside className="lg:col-span-4 space-y-8 lg:sticky lg:top-28">
