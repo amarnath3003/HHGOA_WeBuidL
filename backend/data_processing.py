@@ -636,6 +636,220 @@ def _nft_endpoint_candidates(spec: ChainSpec) -> list[str]:
     return unique_candidates
 
 
+def _explorer_endpoint_candidates(spec: ChainSpec) -> list[str]:
+    candidates: list[str] = []
+
+    if spec.explorer_api_env_var:
+        endpoint = os.getenv(spec.explorer_api_env_var, "").strip()
+        if endpoint:
+            candidates.append(endpoint)
+
+    if spec.name == "ethereum":
+        legacy = os.getenv("ETHERSCORE_EXPLORER_API_URL", "").strip()
+        if legacy:
+            candidates.append(legacy)
+
+    if spec.default_explorer_api:
+        candidates.append(spec.default_explorer_api)
+
+    unique_candidates: list[str] = []
+    for candidate in candidates:
+        normalized = candidate.rstrip("/")
+        if normalized and normalized not in unique_candidates:
+            unique_candidates.append(normalized)
+
+    return unique_candidates
+
+
+def _extract_timestamp_from_item(item: dict[str, Any]) -> datetime | None:
+    for key in ("block_timestamp", "timestamp", "inserted_at", "created_at", "updated_at"):
+        value = item.get(key)
+        if isinstance(value, str):
+            parsed = _to_iso_datetime(value)
+            if parsed is not None:
+                return parsed
+    return None
+
+
+def _address_hash(value: Any) -> str | None:
+    if isinstance(value, str):
+        candidate = value.strip().lower()
+        if candidate.startswith("0x") and len(candidate) == 42:
+            return candidate
+        return None
+
+    if isinstance(value, dict):
+        candidate = value.get("hash")
+        if isinstance(candidate, str):
+            normalized = candidate.strip().lower()
+            if normalized.startswith("0x") and len(normalized) == 42:
+                return normalized
+    return None
+
+
+def _coalesce_points(points: list[tuple[datetime, float]]) -> list[tuple[datetime, float]]:
+    if not points:
+        return []
+
+    ordered = sorted(points, key=lambda entry: entry[0])
+    compacted: list[tuple[datetime, float]] = []
+    for timestamp, value in ordered:
+        if compacted and compacted[-1][0] == timestamp:
+            compacted[-1] = (timestamp, value)
+            continue
+        compacted.append((timestamp, value))
+    return compacted
+
+
+def _resample_points(points: list[tuple[datetime, float]], target_points: int = TREND_TARGET_POINTS) -> list[tuple[datetime, float]]:
+    if not points:
+        return []
+
+    compacted = _coalesce_points(points)
+    if len(compacted) <= target_points:
+        return compacted
+
+    if target_points <= 2:
+        return [compacted[0], compacted[-1]]
+
+    step = (len(compacted) - 1) / (target_points - 1)
+    indices = [min(len(compacted) - 1, int(round(idx * step))) for idx in range(target_points)]
+    sampled: list[tuple[datetime, float]] = []
+    seen: set[int] = set()
+    for index in indices:
+        if index in seen:
+            continue
+        seen.add(index)
+        sampled.append(compacted[index])
+
+    if sampled[-1][0] != compacted[-1][0]:
+        sampled.append(compacted[-1])
+
+    return sampled
+
+
+def _normalize_series_to_percent(
+    points: list[tuple[datetime, float]],
+    *,
+    fallback_percent: float,
+) -> list[float]:
+    if not points:
+        return []
+
+    sampled = _resample_points(points)
+    values = [float(value) for _, value in sampled]
+    lower = min(values)
+    upper = max(values)
+
+    if abs(upper - lower) < 1e-9:
+        fixed = _clamp(fallback_percent, 0.0, 100.0)
+        return [round(fixed, 4) for _ in values]
+
+    return [round(_clamp(((value - lower) / (upper - lower)) * 100.0, 0.0, 100.0), 4) for value in values]
+
+
+def _build_explorer_url(base_endpoint: str, path: str, query: dict[str, Any] | None = None) -> str:
+    root = base_endpoint.rstrip("/")
+    suffix = path.lstrip("/")
+    if not query:
+        return f"{root}/{suffix}"
+
+    filtered_query = {key: value for key, value in query.items() if value not in (None, "")}
+    if not filtered_query:
+        return f"{root}/{suffix}"
+
+    return f"{root}/{suffix}?{urlencode(filtered_query)}"
+
+
+def _fetch_explorer_paginated_items(
+    base_endpoint: str,
+    path: str,
+    *,
+    query: dict[str, Any] | None = None,
+) -> tuple[list[dict[str, Any]], bool]:
+    items: list[dict[str, Any]] = []
+    next_page_params: dict[str, Any] | None = None
+    reached_limit = False
+
+    for _ in range(EXPLORER_MAX_PAGES):
+        merged_query: dict[str, Any] = {}
+        if query:
+            merged_query.update(query)
+        if next_page_params:
+            merged_query.update(next_page_params)
+
+        url = _build_explorer_url(base_endpoint, path, merged_query)
+        payload = _request_json(url, retries=0)
+        page_items = payload.get("items", [])
+        if not isinstance(page_items, list) or not page_items:
+            break
+
+        for entry in page_items:
+            if isinstance(entry, dict):
+                items.append(entry)
+
+        candidate = payload.get("next_page_params")
+        if not isinstance(candidate, dict) or not candidate:
+            break
+        next_page_params = candidate
+    else:
+        reached_limit = True
+
+    return items, reached_limit
+
+
+def _build_cumulative_series_from_timestamps(
+    timestamps: list[datetime],
+) -> list[tuple[datetime, float]]:
+    if not timestamps:
+        return []
+
+    buckets: dict[datetime, int] = {}
+    for timestamp in timestamps:
+        buckets[timestamp] = buckets.get(timestamp, 0) + 1
+
+    running_total = 0.0
+    points: list[tuple[datetime, float]] = []
+    for timestamp in sorted(buckets.keys()):
+        running_total += buckets[timestamp]
+        points.append((timestamp, running_total))
+    return points
+
+
+def _align_series_final_value(
+    points: list[tuple[datetime, float]],
+    *,
+    target_value: float,
+    now: datetime,
+) -> list[tuple[datetime, float]]:
+    if not points:
+        if target_value > 0:
+            return [(now, target_value)]
+        return []
+
+    adjustment = target_value - points[-1][1]
+    if abs(adjustment) < 1e-9:
+        return points
+
+    adjusted = [(timestamp, max(0.0, value + adjustment)) for timestamp, value in points]
+    return adjusted
+
+
+def _quantity_from_transfer(item: dict[str, Any], token_type: str) -> float:
+    normalized_type = token_type.upper()
+    if normalized_type == "ERC-721":
+        return 1.0
+
+    total = item.get("total")
+    if isinstance(total, dict):
+        decimals = max(_safe_int(total.get("decimals"), default=0), 0)
+        raw_value = _safe_int(total.get("value"), default=0)
+        if raw_value > 0:
+            divisor = 10**decimals if decimals > 0 else 1
+            return max(raw_value / divisor, 1.0)
+
+    return 1.0
+
 def _fetch_first_transaction_age_days_from_etherscan(address: str) -> int | None:
     api_key = os.getenv("ETHERSCORE_ETHERSCAN_API_KEY", "").strip()
     if not api_key:
@@ -914,8 +1128,6 @@ def _fetch_chain_snapshot(address: str, chain: str) -> ChainSnapshot:
     account_age_days = rpc_client.get_account_age_days(address)
     if account_age_days is None and spec.supports_etherscan_age:
         account_age_days = _fetch_first_transaction_age_days_from_etherscan(address)
-    if account_age_days is None:
-        account_age_days = 365 if transaction_count > 0 else 30
 
     nft_count, collections = _fetch_nft_snapshot(address, spec)
     ens_name = _fetch_ens_name(address) if spec.supports_ens else None
@@ -933,6 +1145,265 @@ def _fetch_chain_snapshot(address: str, chain: str) -> ChainSnapshot:
         ens_name=ens_name,
         collections=collections,
     )
+
+
+def _build_chain_historical_series(
+    *,
+    address: str,
+    snapshot: ChainSnapshot,
+    native_price_usd: float,
+) -> ChainHistoricalSeries:
+    spec = CHAIN_SPECS[snapshot.chain]
+    endpoints = _explorer_endpoint_candidates(spec)
+    if not endpoints:
+        return ChainHistoricalSeries(
+            wallet_balance_usd_points=[],
+            transaction_points=[],
+            nft_points=[],
+            token_diversity_points=[],
+            first_activity_at=None,
+            source=None,
+            warnings=[],
+        )
+
+    normalized_address = address.lower()
+    now = datetime.now(timezone.utc)
+    chain_warnings: list[str] = []
+    source_used: str | None = None
+
+    for endpoint in endpoints:
+        endpoint_warnings: list[str] = []
+        successful_calls = 0
+
+        def _safe_fetch(
+            path: str,
+            *,
+            query: dict[str, Any] | None = None,
+            label: str,
+        ) -> list[dict[str, Any]]:
+            nonlocal successful_calls
+            try:
+                items, reached_limit = _fetch_explorer_paginated_items(endpoint, path, query=query)
+                successful_calls += 1
+                if reached_limit:
+                    endpoint_warnings.append(
+                        f"Explorer history limit reached for chain '{snapshot.chain}' while fetching {label}. "
+                        f"Increase ETHERSCORE_EXPLORER_MAX_PAGES for deeper history."
+                    )
+                return items
+            except ExternalServiceError as exc:
+                endpoint_warnings.append(
+                    f"Chain '{snapshot.chain}' explorer {label} fetch failed from {_source_name(endpoint)}: {exc}"
+                )
+                return []
+
+        balance_items = _safe_fetch(
+            f"addresses/{address}/coin-balance-history",
+            label="coin-balance-history",
+        )
+        transaction_items = _safe_fetch(
+            f"addresses/{address}/transactions",
+            label="transactions",
+        )
+        nft_transfer_items = _safe_fetch(
+            f"addresses/{address}/token-transfers",
+            query={"type": "ERC-721,ERC-1155"},
+            label="nft-transfers",
+        )
+        erc20_transfer_items = _safe_fetch(
+            f"addresses/{address}/token-transfers",
+            query={"type": "ERC-20"},
+            label="erc20-transfers",
+        )
+
+        if successful_calls == 0:
+            chain_warnings.extend(endpoint_warnings)
+            continue
+
+        source_used = _source_name(endpoint)
+
+        wallet_balance_points: list[tuple[datetime, float]] = []
+        for item in balance_items:
+            timestamp = _extract_timestamp_from_item(item)
+            if timestamp is None:
+                continue
+            native_balance = _safe_int(item.get("value"), default=0) / (10**18)
+            wallet_balance_usd = max((native_balance * native_price_usd) + snapshot.usdt_balance, 0.0)
+            wallet_balance_points.append((timestamp, wallet_balance_usd))
+        wallet_balance_points = _coalesce_points(wallet_balance_points)
+
+        transaction_timestamps: list[datetime] = []
+        for item in transaction_items:
+            timestamp = _extract_timestamp_from_item(item)
+            if timestamp is not None:
+                transaction_timestamps.append(timestamp)
+        transaction_points = _build_cumulative_series_from_timestamps(transaction_timestamps)
+        transaction_points = _align_series_final_value(
+            transaction_points,
+            target_value=float(snapshot.transaction_count),
+            now=now,
+        )
+
+        nft_events: list[tuple[datetime, float]] = []
+        for item in nft_transfer_items:
+            timestamp = _extract_timestamp_from_item(item)
+            if timestamp is None:
+                continue
+
+            token_type_raw = item.get("token_type")
+            if not isinstance(token_type_raw, str):
+                token = item.get("token")
+                if isinstance(token, dict):
+                    token_type_raw = token.get("type")
+            token_type = str(token_type_raw or "").upper()
+            if token_type not in {"ERC-721", "ERC-1155"}:
+                continue
+
+            from_hash = _address_hash(item.get("from"))
+            to_hash = _address_hash(item.get("to"))
+            quantity = _quantity_from_transfer(item, token_type)
+
+            delta = 0.0
+            if to_hash == normalized_address and from_hash != normalized_address:
+                delta += quantity
+            if from_hash == normalized_address and to_hash != normalized_address:
+                delta -= quantity
+            if abs(delta) > 0.0:
+                nft_events.append((timestamp, delta))
+
+        nft_points: list[tuple[datetime, float]] = []
+        nft_running = 0.0
+        for timestamp, delta in sorted(nft_events, key=lambda item: item[0]):
+            nft_running = max(0.0, nft_running + delta)
+            nft_points.append((timestamp, nft_running))
+        nft_points = _align_series_final_value(
+            _coalesce_points(nft_points),
+            target_value=float(snapshot.nft_count),
+            now=now,
+        )
+
+        token_events: list[tuple[datetime, str]] = []
+        for item in erc20_transfer_items:
+            timestamp = _extract_timestamp_from_item(item)
+            if timestamp is None:
+                continue
+
+            token = item.get("token")
+            if not isinstance(token, dict):
+                continue
+            address_hash = token.get("address_hash")
+            if not isinstance(address_hash, str):
+                continue
+
+            normalized_token = address_hash.strip().lower()
+            if not normalized_token.startswith("0x") or len(normalized_token) != 42:
+                continue
+            token_events.append((timestamp, normalized_token))
+
+        token_diversity_points: list[tuple[datetime, float]] = []
+        seen_tokens: set[str] = set()
+        for timestamp, token_address in sorted(token_events, key=lambda item: item[0]):
+            if token_address in seen_tokens:
+                continue
+            seen_tokens.add(token_address)
+            token_diversity_points.append((timestamp, float(len(seen_tokens))))
+        token_diversity_points = _align_series_final_value(
+            _coalesce_points(token_diversity_points),
+            target_value=float(snapshot.token_diversity),
+            now=now,
+        )
+
+        first_activity_candidates: list[datetime] = []
+        for series in (wallet_balance_points, transaction_points, nft_points, token_diversity_points):
+            if series:
+                first_activity_candidates.append(series[0][0])
+        if snapshot.account_age_days is not None and snapshot.account_age_days > 0:
+            first_activity_candidates.append(now - timedelta(days=snapshot.account_age_days))
+        first_activity_at = min(first_activity_candidates) if first_activity_candidates else None
+
+        chain_warnings.extend(endpoint_warnings)
+        return ChainHistoricalSeries(
+            wallet_balance_usd_points=wallet_balance_points,
+            transaction_points=transaction_points,
+            nft_points=nft_points,
+            token_diversity_points=token_diversity_points,
+            first_activity_at=first_activity_at,
+            source=source_used,
+            warnings=chain_warnings,
+        )
+
+    return ChainHistoricalSeries(
+        wallet_balance_usd_points=[],
+        transaction_points=[],
+        nft_points=[],
+        token_diversity_points=[],
+        first_activity_at=None,
+        source=source_used,
+        warnings=chain_warnings,
+    )
+
+
+def _merge_chain_value_series(
+    series_by_chain: dict[str, list[tuple[datetime, float]]],
+    *,
+    target_total: float,
+    now: datetime,
+) -> list[tuple[datetime, float]]:
+    if not series_by_chain:
+        return [(now, target_total)] if target_total > 0 else []
+
+    current_by_chain = {chain_name: 0.0 for chain_name in series_by_chain}
+    events: list[tuple[datetime, str, float]] = []
+    for chain_name, series in series_by_chain.items():
+        for timestamp, value in series:
+            events.append((timestamp, chain_name, max(0.0, value)))
+
+    if not events:
+        return [(now, target_total)] if target_total > 0 else []
+
+    events.sort(key=lambda entry: entry[0])
+    merged: list[tuple[datetime, float]] = []
+    for timestamp, chain_name, value in events:
+        current_by_chain[chain_name] = value
+        total = sum(current_by_chain.values())
+        if merged and merged[-1][0] == timestamp:
+            merged[-1] = (timestamp, total)
+        else:
+            merged.append((timestamp, total))
+
+    merged = _align_series_final_value(_coalesce_points(merged), target_value=target_total, now=now)
+    return merged
+
+
+def _build_account_age_series(
+    *,
+    account_age_days: int,
+    first_activity_at: datetime | None,
+    now: datetime,
+) -> list[tuple[datetime, float]]:
+    if account_age_days <= 0:
+        return []
+
+    start = first_activity_at
+    if start is None:
+        start = now - timedelta(days=account_age_days)
+    if start > now:
+        start = now
+
+    span_seconds = max((now - start).total_seconds(), 0.0)
+    if span_seconds <= 0:
+        return [(now, float(account_age_days))]
+
+    point_count = min(TREND_TARGET_POINTS, max(24, int(account_age_days // 30) + 2))
+    points: list[tuple[datetime, float]] = []
+    for index in range(point_count):
+        ratio = index / (point_count - 1) if point_count > 1 else 1.0
+        timestamp = start + timedelta(seconds=span_seconds * ratio)
+        points.append((timestamp, float(account_age_days) * ratio))
+
+    points[-1] = (points[-1][0], float(account_age_days))
+    return _coalesce_points(points)
+
 
 def _compute_volatility_index(
     *,
