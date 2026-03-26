@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -41,6 +41,18 @@ ETHERSCAN_API_URL = os.getenv("ETHERSCORE_ETHERSCAN_API_URL", "https://api.ether
 DEFAULT_ETH_INFURA_RPC = "https://mainnet.infura.io/v3/84842078b09946638c03157f83405213"
 DEFAULT_ETH_ALCHEMY_RPC = "https://eth-mainnet.g.alchemy.com/v2/demo"
 DEFAULT_ETH_NFT_API = "https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner"
+DEFAULT_ETH_EXPLORER_API = "https://eth.blockscout.com/api/v2"
+DEFAULT_POLYGON_EXPLORER_API = "https://polygon.blockscout.com/api/v2"
+
+try:
+    EXPLORER_MAX_PAGES = max(1, int(os.getenv("ETHERSCORE_EXPLORER_MAX_PAGES", "200")))
+except ValueError:
+    EXPLORER_MAX_PAGES = 200
+
+try:
+    TREND_TARGET_POINTS = max(24, int(os.getenv("ETHERSCORE_TREND_TARGET_POINTS", "120")))
+except ValueError:
+    TREND_TARGET_POINTS = 120
 
 
 class ExternalServiceError(RuntimeError):
@@ -70,6 +82,8 @@ class ChainSpec:
     default_rpc_candidates: tuple[str, ...] = ()
     nft_env_var: str | None = None
     default_nft_endpoint: str | None = None
+    explorer_api_env_var: str | None = None
+    default_explorer_api: str | None = None
     supports_ens: bool = False
     supports_etherscan_age: bool = False
 
@@ -87,6 +101,16 @@ class ChainSnapshot:
     account_age_days: int | None
     ens_name: str | None
     collections: list[tuple[str, int]]
+
+
+@dataclass(frozen=True)
+class ChainHistoricalSeries:
+    wallet_balance_usd_points: list[tuple[datetime, float]]
+    transaction_points: list[tuple[datetime, float]]
+    nft_points: list[tuple[datetime, float]]
+    token_diversity_points: list[tuple[datetime, float]]
+    first_activity_at: datetime | None
+    source: str | None
 
 
 @dataclass
@@ -183,6 +207,8 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         default_rpc_candidates=(DEFAULT_ETH_ALCHEMY_RPC, DEFAULT_ETH_INFURA_RPC),
         nft_env_var="ETHERSCORE_NFT_API_URL_ETHEREUM",
         default_nft_endpoint=DEFAULT_ETH_NFT_API,
+        explorer_api_env_var="ETHERSCORE_EXPLORER_API_URL_ETHEREUM",
+        default_explorer_api=DEFAULT_ETH_EXPLORER_API,
         supports_ens=True,
         supports_etherscan_age=True,
     ),
@@ -193,6 +219,8 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         price_key="matic-network",
         usdt_contract="0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         nft_env_var="ETHERSCORE_NFT_API_URL_POLYGON",
+        explorer_api_env_var="ETHERSCORE_EXPLORER_API_URL_POLYGON",
+        default_explorer_api=DEFAULT_POLYGON_EXPLORER_API,
     ),
     "bsc": ChainSpec(
         name="bsc",
@@ -201,6 +229,7 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         price_key="binancecoin",
         usdt_contract="0x55d398326f99059fF775485246999027B3197955",
         nft_env_var="ETHERSCORE_NFT_API_URL_BSC",
+        explorer_api_env_var="ETHERSCORE_EXPLORER_API_URL_BSC",
     ),
     "arbitrum": ChainSpec(
         name="arbitrum",
@@ -209,6 +238,8 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         price_key="ethereum",
         usdt_contract="0xFd086bC7CD5C481DCC9C85ebe478A1C0b69FCbb9",
         nft_env_var="ETHERSCORE_NFT_API_URL_ARBITRUM",
+        explorer_api_env_var="ETHERSCORE_EXPLORER_API_URL_ARBITRUM",
+        default_explorer_api="https://arbitrum.blockscout.com/api/v2",
     ),
 }
 
