@@ -31,6 +31,18 @@ def _snapshot(chain: str) -> dp.ChainSnapshot:
     )
 
 
+def _empty_history() -> dp.ChainHistoricalSeries:
+    return dp.ChainHistoricalSeries(
+        wallet_balance_usd_points=[],
+        transaction_points=[],
+        nft_points=[],
+        token_diversity_points=[],
+        first_activity_at=None,
+        source=None,
+        warnings=[],
+    )
+
+
 def test_invalid_wallet_address_rejected() -> None:
     _reset_caches()
     with pytest.raises(ValueError, match="Wallet address must be a valid"):
@@ -42,6 +54,11 @@ def test_score_determinism_and_factor_bounds(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr(dp, "_rpc_candidates", lambda spec: [f"https://{spec.name}.rpc.local"])
     monkeypatch.setattr(dp, "_fetch_chain_snapshot", lambda address, chain: _snapshot(chain))
+    monkeypatch.setattr(
+        dp,
+        "_build_chain_historical_series",
+        lambda address, snapshot, native_price_usd: _empty_history(),
+    )
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
@@ -66,6 +83,11 @@ def test_partial_failure_returns_partial_data(monkeypatch: pytest.MonkeyPatch) -
     _reset_caches()
 
     monkeypatch.setattr(dp, "_rpc_candidates", lambda spec: [f"https://{spec.name}.rpc.local"])
+    monkeypatch.setattr(
+        dp,
+        "_build_chain_historical_series",
+        lambda address, snapshot, native_price_usd: _empty_history(),
+    )
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
@@ -109,6 +131,11 @@ def test_credit_score_uses_model_prediction(monkeypatch: pytest.MonkeyPatch) -> 
     _reset_caches()
     monkeypatch.setattr(dp, "_rpc_candidates", lambda spec: [f"https://{spec.name}.rpc.local"])
     monkeypatch.setattr(dp, "_fetch_chain_snapshot", lambda address, chain: _snapshot(chain))
+    monkeypatch.setattr(
+        dp,
+        "_build_chain_historical_series",
+        lambda address, snapshot, native_price_usd: _empty_history(),
+    )
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
