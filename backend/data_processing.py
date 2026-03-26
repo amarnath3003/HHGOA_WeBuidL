@@ -1771,7 +1771,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         normalized_value = normalized_factors[factor.name]
         factor_score = int(round(normalized_value * 100))
         weighted_points = round((factor.weight / 100.0) * factor_score, 1)
-        unknown_age = factor.name == "Account Age" and account_age_days is None
+        unknown_age = factor.name == "Account Age" and account_age_days <= 0 and total_transactions > 0
 
         factors.append(
             {
@@ -1784,7 +1784,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
                 "value": _format_factor_value(factor, factor_raw_values[factor.name], unknown_age),
                 "score": factor_score,
                 "weighted_points": weighted_points,
-                "trend": [],
+                "trend": factor_trends.get(factor.name, []),
                 "normalized_value": round(normalized_value, 4),
                 "rationale": _factor_rationale(factor.name, normalized_value),
             }
@@ -1823,6 +1823,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
             "rpc": ", ".join(sorted({_source_name(snapshot.rpc_source) for snapshot in snapshots})),
             "nft_api": ", ".join(nft_sources) if nft_sources else "not configured",
             "ens_api": _source_name(ENS_API_URL),
+            "explorer_api": ", ".join(sorted(history_sources)) if history_sources else "not configured",
         },
     }
 
