@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
 from backend import data_processing as dp
@@ -180,3 +182,40 @@ def test_credit_score_uses_model_prediction(monkeypatch: pytest.MonkeyPatch) -> 
     assert captured_features["nft_ownership_volume"] == pytest.approx(12.0)
     assert captured_features["account_age_days"] == pytest.approx(420.0)
     assert captured_features["token_diversity"] == pytest.approx(6.0)
+
+
+def test_all_time_history_populates_trends_and_age(monkeypatch: pytest.MonkeyPatch) -> None:
+    _reset_caches()
+
+    now = datetime.now(timezone.utc)
+    history_start = now - timedelta(days=1200)
+
+    monkeypatch.setattr(dp, "_rpc_candidates", lambda spec: [f"https://{spec.name}.rpc.local"])
+    monkeypatch.setattr(dp, "_fetch_chain_snapshot", lambda address, chain: _snapshot(chain))
+    monkeypatch.setattr(
+        dp,
+        "_get_native_prices_usd",
+        lambda required_chains=None: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
+    )
+
+    def fake_history(address: str, snapshot: dp.ChainSnapshot, native_price_usd: float) -> dp.ChainHistoricalSeries:
+        return dp.ChainHistoricalSeries(
+            wallet_balance_usd_points=[(history_start, 5000.0), (now, 4250.0)],
+            transaction_points=[(history_start, 5.0), (now, 250.0)],
+            nft_points=[(history_start, 2.0), (now, 12.0)],
+            token_diversity_points=[(history_start, 1.0), (now, 6.0)],
+            first_activity_at=history_start,
+            source="eth.blockscout.com",
+            warnings=[],
+        )
+
+    monkeypatch.setattr(dp, "_build_chain_historical_series", fake_history)
+
+    result = dp.build_score_payload(ADDRESS, chains=["ethereum"])
+    summary = result.payload["summary"]
+
+    assert summary["account_age_days"] >= 1199
+    assert summary["data_sources"]["explorer_api"] == "eth.blockscout.com"
+
+    for factor in result.payload["factors"]:
+        assert len(factor["trend"]) >= 2

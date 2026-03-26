@@ -45,14 +45,26 @@ DEFAULT_ETH_EXPLORER_API = "https://eth.blockscout.com/api/v2"
 DEFAULT_POLYGON_EXPLORER_API = "https://polygon.blockscout.com/api/v2"
 
 try:
-    EXPLORER_MAX_PAGES = max(1, int(os.getenv("ETHERSCORE_EXPLORER_MAX_PAGES", "200")))
+    EXPLORER_MAX_PAGES = max(1, int(os.getenv("ETHERSCORE_EXPLORER_MAX_PAGES", "60")))
 except ValueError:
-    EXPLORER_MAX_PAGES = 200
+    EXPLORER_MAX_PAGES = 60
 
 try:
     TREND_TARGET_POINTS = max(24, int(os.getenv("ETHERSCORE_TREND_TARGET_POINTS", "120")))
 except ValueError:
     TREND_TARGET_POINTS = 120
+
+try:
+    EXPLORER_MAX_SECONDS = max(5.0, float(os.getenv("ETHERSCORE_EXPLORER_MAX_SECONDS", "20")))
+except ValueError:
+    EXPLORER_MAX_SECONDS = 20.0
+
+try:
+    EXPLORER_REQUEST_TIMEOUT_SECONDS = max(
+        2.0, float(os.getenv("ETHERSCORE_EXPLORER_REQUEST_TIMEOUT_SECONDS", str(min(REQUEST_TIMEOUT_SECONDS, 8.0))))
+    )
+except ValueError:
+    EXPLORER_REQUEST_TIMEOUT_SECONDS = min(REQUEST_TIMEOUT_SECONDS, 8.0)
 
 
 class ExternalServiceError(RuntimeError):
@@ -770,8 +782,13 @@ def _fetch_explorer_paginated_items(
     items: list[dict[str, Any]] = []
     next_page_params: dict[str, Any] | None = None
     reached_limit = False
+    started_at = time.monotonic()
 
     for _ in range(EXPLORER_MAX_PAGES):
+        if (time.monotonic() - started_at) > EXPLORER_MAX_SECONDS:
+            reached_limit = True
+            break
+
         merged_query: dict[str, Any] = {}
         if query:
             merged_query.update(query)
@@ -779,7 +796,11 @@ def _fetch_explorer_paginated_items(
             merged_query.update(next_page_params)
 
         url = _build_explorer_url(base_endpoint, path, merged_query)
-        payload = _request_json(url, retries=0)
+        payload = _request_json(
+            url,
+            retries=0,
+            timeout_seconds=EXPLORER_REQUEST_TIMEOUT_SECONDS,
+        )
         page_items = payload.get("items", [])
         if not isinstance(page_items, list) or not page_items:
             break
