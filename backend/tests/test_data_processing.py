@@ -45,7 +45,7 @@ def test_score_determinism_and_factor_bounds(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
-        lambda: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
+        lambda required_chains=None: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
     )
 
     result_1 = dp.build_score_payload(ADDRESS, chains=["ethereum", "polygon"])
@@ -69,7 +69,7 @@ def test_partial_failure_returns_partial_data(monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
-        lambda: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
+        lambda required_chains=None: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
     )
 
     def fake_fetch_snapshot(address: str, chain: str) -> dp.ChainSnapshot:
@@ -112,7 +112,7 @@ def test_credit_score_uses_model_prediction(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr(
         dp,
         "_get_native_prices_usd",
-        lambda: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
+        lambda required_chains=None: {"ethereum": 3000.0, "polygon": 1.0, "bsc": 500.0, "arbitrum": 3000.0},
     )
 
     model = dp.WeightedCreditModel(
