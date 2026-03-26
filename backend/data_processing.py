@@ -480,7 +480,7 @@ class EthereumRpcClient:
         )
         return _safe_int(result) / (10**decimals)
 
-    def get_token_diversity(self, address: str, *, has_activity: bool) -> int:
+    def get_token_diversity(self, address: str) -> int:
         try:
             result = self._call("alchemy_getTokenBalances", [address, "DEFAULT_TOKENS"], retries=0)
         except ExternalServiceError as exc:
@@ -844,8 +844,7 @@ def _fetch_chain_snapshot(address: str, chain: str) -> ChainSnapshot:
     except ExternalServiceError:
         usdt_balance = 0.0
 
-    has_activity = bool(native_balance > 0 or usdt_balance > 0 or transaction_count > 0)
-    token_diversity = rpc_client.get_token_diversity(address, has_activity=has_activity)
+    token_diversity = rpc_client.get_token_diversity(address)
 
     account_age_days = rpc_client.get_account_age_days(address)
     if account_age_days is None and spec.supports_etherscan_age:
