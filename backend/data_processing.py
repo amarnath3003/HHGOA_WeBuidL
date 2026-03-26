@@ -1621,11 +1621,53 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
     if active_chain_count == 0:
         active_chain_count = len(chains_used)
 
-    account_age_days = min(account_age_candidates) if account_age_candidates else None
-    if account_age_days is None:
-        raise RuntimeError(
-            "Unable to derive account age from requested chains. Configure provider support for transfer history."
+    now = datetime.now(timezone.utc)
+    history_sources: set[str] = set()
+    first_activity_candidates: list[datetime] = []
+    wallet_history_by_chain: dict[str, list[tuple[datetime, float]]] = {}
+    transaction_history_by_chain: dict[str, list[tuple[datetime, float]]] = {}
+    nft_history_by_chain: dict[str, list[tuple[datetime, float]]] = {}
+    token_diversity_history_by_chain: dict[str, list[tuple[datetime, float]]] = {}
+
+    for snapshot in snapshots:
+        native_price = _safe_float(price_map.get(snapshot.chain), default=0.0)
+        if native_price <= 0.0:
+            continue
+
+        historical_series = _build_chain_historical_series(
+            address=normalized_address,
+            snapshot=snapshot,
+            native_price_usd=native_price,
         )
+        warnings.extend(historical_series.warnings)
+
+        if historical_series.source:
+            history_sources.add(historical_series.source)
+        if historical_series.first_activity_at is not None:
+            first_activity_candidates.append(historical_series.first_activity_at)
+        if historical_series.wallet_balance_usd_points:
+            wallet_history_by_chain[snapshot.chain] = historical_series.wallet_balance_usd_points
+        if historical_series.transaction_points:
+            transaction_history_by_chain[snapshot.chain] = historical_series.transaction_points
+        if historical_series.nft_points:
+            nft_history_by_chain[snapshot.chain] = historical_series.nft_points
+        if historical_series.token_diversity_points:
+            token_diversity_history_by_chain[snapshot.chain] = historical_series.token_diversity_points
+
+    account_age_days = max(account_age_candidates) if account_age_candidates else None
+    if first_activity_candidates:
+        oldest_activity = min(first_activity_candidates)
+        historical_age_days = max((now - oldest_activity).days, 1)
+        if account_age_days is None or historical_age_days > account_age_days:
+            account_age_days = historical_age_days
+    if account_age_days is None:
+        if total_transactions > 0:
+            warnings.append(
+                "Unable to derive account age from on-chain history providers. "
+                "Using 0 days until full historical data is available."
+            )
+        account_age_days = 0
+
     account_age_for_model = float(account_age_days)
     total_assets_usd = total_native_usd + total_usdt
     model_features = {
@@ -1672,6 +1714,56 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         "NFT Holdings": float(total_nfts),
         "Account Age": account_age_for_model,
         "Network Diversity": float(total_token_diversity),
+    }
+
+    overall_first_activity = min(first_activity_candidates) if first_activity_candidates else None
+    wallet_history_points = _merge_chain_value_series(
+        wallet_history_by_chain,
+        target_total=float(total_assets_usd),
+        now=now,
+    )
+    transaction_history_points = _merge_chain_value_series(
+        transaction_history_by_chain,
+        target_total=float(total_transactions),
+        now=now,
+    )
+    nft_history_points = _merge_chain_value_series(
+        nft_history_by_chain,
+        target_total=float(total_nfts),
+        now=now,
+    )
+    token_diversity_history_points = _merge_chain_value_series(
+        token_diversity_history_by_chain,
+        target_total=float(total_token_diversity),
+        now=now,
+    )
+    account_age_history_points = _build_account_age_series(
+        account_age_days=account_age_days,
+        first_activity_at=overall_first_activity,
+        now=now,
+    )
+
+    factor_trends = {
+        "Wallet Balance": _normalize_series_to_percent(
+            wallet_history_points,
+            fallback_percent=normalized_factors["Wallet Balance"] * 100.0,
+        ),
+        "Transaction History": _normalize_series_to_percent(
+            transaction_history_points,
+            fallback_percent=normalized_factors["Transaction History"] * 100.0,
+        ),
+        "NFT Holdings": _normalize_series_to_percent(
+            nft_history_points,
+            fallback_percent=normalized_factors["NFT Holdings"] * 100.0,
+        ),
+        "Account Age": _normalize_series_to_percent(
+            account_age_history_points,
+            fallback_percent=normalized_factors["Account Age"] * 100.0,
+        ),
+        "Network Diversity": _normalize_series_to_percent(
+            token_diversity_history_points,
+            fallback_percent=normalized_factors["Network Diversity"] * 100.0,
+        ),
     }
 
     factors: list[dict[str, Any]] = []
