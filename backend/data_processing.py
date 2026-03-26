@@ -1089,7 +1089,11 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         active_chain_count = len(chains_used)
 
     account_age_days = min(account_age_candidates) if account_age_candidates else None
-    account_age_for_model = float(account_age_days if account_age_days is not None else 365)
+    if account_age_days is None:
+        raise RuntimeError(
+            "Unable to derive account age from requested chains. Configure provider support for transfer history."
+        )
+    account_age_for_model = float(account_age_days)
     total_assets_usd = total_native_usd + total_usdt
     model_features = {
         "wallet_balance_usd": float(total_assets_usd),
