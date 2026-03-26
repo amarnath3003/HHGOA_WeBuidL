@@ -111,6 +111,7 @@ class ChainHistoricalSeries:
     token_diversity_points: list[tuple[datetime, float]]
     first_activity_at: datetime | None
     source: str | None
+    warnings: list[str]
 
 
 @dataclass
