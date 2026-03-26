@@ -1,28 +1,13 @@
 import React from 'react';
 
-const fallbackSummary = {
-  usdt_balance_display: '$0.00',
-  ens_name: 'No ENS set',
-  nft_count: 0,
-  transaction_count: 0,
-  account_age_display: '0 days',
-  network_diversity: 0,
-};
-
-const fallbackCollections = [
-  { name: 'Nebula Vault', tier: 'Blue Chip', estimated_value_display: '$0.00', accent: '#b1c5ff' },
-  { name: 'Signal Archive', tier: 'Growth', estimated_value_display: '$0.00', accent: '#cdbdff' },
-  { name: 'Atlas Registry', tier: 'Emerging', estimated_value_display: '$0.00', accent: '#622ae4' },
-];
-
-const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallbackCollections }) => {
-  const walletSummary = summary || fallbackSummary;
-  const collections = Array.isArray(featuredCollections) && featuredCollections.length > 0 ? featuredCollections : fallbackCollections;
+const WalletSummary = ({ summary, featuredCollections }) => {
+  const walletSummary = summary || {};
+  const collections = Array.isArray(featuredCollections) ? featuredCollections : [];
 
   const stats = [
     {
       title: 'USDT Balance',
-      value: walletSummary.usdt_balance_display,
+      value: walletSummary.usdt_balance_display || 'N/A',
       subtitle: 'Tether USD',
       icon: 'currency_exchange',
       color: 'text-tertiary',
@@ -30,7 +15,7 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
     },
     {
       title: 'ENS Identity',
-      value: walletSummary.ens_name || 'No ENS set',
+      value: walletSummary.ens_name || 'N/A',
       subtitle: 'Wallet naming',
       icon: 'alternate_email',
       color: 'text-tertiary',
@@ -38,15 +23,15 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
     },
     {
       title: 'Transaction Count',
-      value: `${walletSummary.transaction_count ?? 0}`,
-      subtitle: walletSummary.account_age_display || 'Account activity',
+      value: `${walletSummary.transaction_count ?? 'N/A'}`,
+      subtitle: walletSummary.account_age_display || 'Account age unavailable',
       icon: 'history',
       color: 'text-primary',
       background: 'bg-primary/15',
     },
     {
       title: 'Network Diversity',
-      value: `${walletSummary.network_diversity ?? 0} chains`,
+      value: typeof walletSummary.network_diversity === 'number' ? `${walletSummary.network_diversity} chains` : 'N/A',
       subtitle: `${walletSummary.nft_count ?? 0} NFTs tracked`,
       icon: 'lan',
       color: 'text-primary',
@@ -88,27 +73,21 @@ const WalletSummary = ({ summary = fallbackSummary, featuredCollections = fallba
           <span className="text-[11px] font-mono text-on-surface-variant">{walletSummary.nft_count ?? 0} Assets</span>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-2">
-          {collections.map((collection) => (
-            <article key={collection.name} className="flex-shrink-0 w-40 group cursor-pointer hover:-translate-y-2 transition-transform duration-300">
-              <div
-                className="aspect-square rounded-xl mb-2 shadow-sm group-hover:shadow-lg transition-all duration-300 flex flex-col justify-between p-4 border border-white/10"
-                style={{
-                  background: `linear-gradient(160deg, ${collection.accent}33, rgba(19, 19, 19, 0.95))`,
-                  boxShadow: `0 20px 40px -24px ${collection.accent}`,
-                }}
-              >
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/65">{collection.tier}</span>
-                <div>
-                  <div className="text-xl font-black text-white/90">{collection.name.slice(0, 2).toUpperCase()}</div>
-                  <div className="text-xs text-white/50 mt-1">Estimated</div>
-                </div>
-              </div>
-              <div className="text-xs font-bold truncate group-hover:text-tertiary-fixed-dim transition-colors">{collection.name}</div>
-              <div className="text-[11px] font-mono text-on-surface-variant mt-1">{collection.estimated_value_display}</div>
-            </article>
-          ))}
-        </div>
+        {collections.length === 0 ? (
+          <div className="rounded-xl border border-outline-variant/20 bg-surface-container-low p-4 text-sm text-on-surface-variant">
+            No NFT collection data returned from configured providers.
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-2">
+            {collections.map((collection) => (
+              <article key={`${collection.chain}-${collection.name}`} className="flex-shrink-0 w-44 rounded-xl border border-outline-variant/20 bg-surface-container-low p-4">
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">{collection.chain || 'unknown chain'}</div>
+                <div className="mt-3 text-sm font-bold text-on-surface truncate">{collection.name}</div>
+                <div className="mt-2 text-xs font-mono text-tertiary">{collection.quantity ?? 1} items</div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
