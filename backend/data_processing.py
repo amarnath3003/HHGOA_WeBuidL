@@ -1172,6 +1172,13 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         token_diversity_total=total_token_diversity,
     )
     data_quality = "complete" if len(chains_used) == len(requested_chains) else "partial"
+    nft_sources = sorted(
+        {
+            _source_name(endpoint)
+            for chain in requested_chains
+            for endpoint in _nft_endpoint_candidates(CHAIN_SPECS[chain])
+        }
+    )
 
     summary = {
         "usdt_balance_usd": round(total_usdt, 2),
@@ -1189,7 +1196,7 @@ def build_score_payload(address: str, chains: Sequence[str] | None = None) -> Sc
         "data_quality": data_quality,
         "data_sources": {
             "rpc": ", ".join(sorted({_source_name(snapshot.rpc_source) for snapshot in snapshots})),
-            "nft_api": _source_name(os.getenv("ETHERSCORE_NFT_API_URL", "")),
+            "nft_api": ", ".join(nft_sources) if nft_sources else "not configured",
             "ens_api": _source_name(ENS_API_URL),
         },
     }
