@@ -1,4 +1,16 @@
 import React from 'react';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Filler,
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
 const toPercent = (factor) => {
   const normalized = Number(factor?.normalized_value);
@@ -10,6 +22,53 @@ const toPercent = (factor) => {
     return Math.max(0, Math.min(100, Math.round(score)));
   }
   return 0;
+};
+
+const toSeries = (factor, normalizedPercent) => {
+  if (Array.isArray(factor?.trend) && factor.trend.length > 1) {
+    return factor.trend.map((point) => {
+      const numeric = Number(point);
+      if (!Number.isFinite(numeric)) {
+        return normalizedPercent;
+      }
+      return Math.max(0, Math.min(100, numeric));
+    });
+  }
+  return Array.from({ length: 12 }, () => normalizedPercent);
+};
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    tooltip: {
+      enabled: true,
+      displayColors: false,
+      backgroundColor: 'rgba(31, 32, 32, 0.92)',
+      titleColor: '#e4e2e1',
+      bodyColor: '#c3c6d6',
+      callbacks: {
+        title: () => '',
+        label: (ctx) => `Level: ${Math.round(ctx.parsed.y)}`,
+      },
+    },
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: { display: false },
+    y: { display: false, min: 0, max: 100 },
+  },
+  elements: {
+    line: { tension: 0.32, borderWidth: 2 },
+    point: { radius: 0, hoverRadius: 3, hitRadius: 8 },
+  },
+  interaction: {
+    mode: 'nearest',
+    axis: 'x',
+    intersect: false,
+  },
 };
 
 const ScoreBreakdown = ({ factors, summary, warnings }) => {
@@ -83,6 +142,25 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
         {safeFactors.map((factor, index) => {
           const normalizedPercent = toPercent(factor);
+          const series = toSeries(factor, normalizedPercent);
+          const chartData = {
+            labels: Array.from({ length: series.length }, () => ''),
+            datasets: [
+              {
+                data: series,
+                borderColor: factor.color,
+                backgroundColor: (context) => {
+                  const ctx = context.chart.ctx;
+                  const gradient = ctx.createLinearGradient(0, 0, 0, 70);
+                  gradient.addColorStop(0, `${factor.color}66`);
+                  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                  return gradient;
+                },
+                fill: true,
+              },
+            ],
+          };
+
           return (
             <article
               key={`${factor.name}-${index}`}
@@ -117,7 +195,7 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-2 gap-3 text-xs mb-4">
                 <div className="rounded-md bg-surface-container p-2">
                   <p className="text-on-surface-variant font-mono uppercase tracking-wider mb-1">Value</p>
                   <p className="text-on-surface font-semibold">{factor.value}</p>
@@ -129,6 +207,13 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
                 <div className="rounded-md bg-surface-container p-2 col-span-2">
                   <p className="text-on-surface-variant font-mono uppercase tracking-wider mb-1">Rationale</p>
                   <p className="text-on-surface-variant">{factor.rationale}</p>
+                </div>
+              </div>
+
+              <div className="rounded-md bg-surface-container p-2">
+                <p className="text-[10px] font-mono uppercase tracking-wider text-on-surface-variant mb-1">Live Factor Graph</p>
+                <div className="h-[64px] w-full">
+                  <Line data={chartData} options={chartOptions} />
                 </div>
               </div>
             </article>
