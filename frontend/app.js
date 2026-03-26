@@ -7,10 +7,13 @@ import ScoreBreakdown from './ScoreBreakdown';
 import ScoreAnalysis from './ScoreAnalysis';
 import './App.css';
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
 function App() {
   const [web3, setWeb3] = useState(null);
   const [address, setAddress] = useState('');
   const [creditScore, setCreditScore] = useState(null);
+  const [walletData, setWalletData] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -40,9 +43,28 @@ function App() {
     }
   };
 
-  const getCreditScore = () => {
-    const score = Math.floor(Math.random() * (850 - 300 + 1)) + 300;
-    setCreditScore(score);
+  const getCreditScore = async () => {
+    if (!address) {
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address }),
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || payload.message || 'Unable to calculate credit score.');
+      }
+      setCreditScore(payload.score);
+      setWalletData(payload);
+    } catch (error) {
+      console.error(error);
+      alert(error.message || 'Unable to calculate credit score.');
+    }
   };
 
   return (
@@ -79,9 +101,9 @@ function App() {
         {creditScore && (
           <>
             <CreditScoreSpeedometer score={creditScore} />
-            <WalletSummary />
-            <ScoreBreakdown />
-            <ScoreAnalysis score={creditScore} />
+            <WalletSummary summary={walletData?.summary} featuredCollections={walletData?.featured_collections} />
+            <ScoreBreakdown factors={walletData?.factors} summary={walletData?.summary} warnings={walletData?.meta?.warnings} />
+            <ScoreAnalysis payload={walletData} />
           </>
         )}
       </div>
