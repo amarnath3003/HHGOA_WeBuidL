@@ -1,40 +1,45 @@
 import React from 'react';
 
-const ScoreAnalysis = ({ score }) => {
-  const averageScore = 720;
-  const delta = score - averageScore;
-  const percentile = Math.max(1, Math.min(99, Math.round(((score - 300) / 550) * 100)));
+const suggestionForFactor = (factorName) => {
+  if (factorName === 'Wallet Balance') {
+    return 'Maintain stable wallet reserves over time to strengthen this signal.';
+  }
+  if (factorName === 'Transaction History') {
+    return 'Consistent on-chain activity improves transaction reliability signals.';
+  }
+  if (factorName === 'NFT Holdings') {
+    return 'Sustained NFT ownership can improve asset-profile depth.';
+  }
+  if (factorName === 'Account Age') {
+    return 'Account age improves naturally with sustained activity history.';
+  }
+  if (factorName === 'Network Diversity') {
+    return 'Using multiple ecosystems can strengthen cross-network resilience.';
+  }
+  return 'Keep building consistent on-chain behavior to improve this factor.';
+};
 
-  const insights = [
-    {
-      factor: 'Wallet Balance',
-      impact: 'High',
-      suggestion: 'Maintain a stable balance to improve your score.',
-      icon: 'account_balance_wallet',
-      color: '#ffb4ab',
-    },
-    {
-      factor: 'Transaction History',
-      impact: 'Medium',
-      suggestion: 'Increase your transaction frequency for a better score.',
-      icon: 'history',
-      color: '#cdbdff',
-    },
-    {
-      factor: 'NFT Holdings',
-      impact: 'Low',
-      suggestion: 'Diversify your NFT portfolio to potentially boost your score.',
-      icon: 'token',
-      color: '#b1c5ff',
-    },
-  ];
+const ScoreAnalysis = ({ payload }) => {
+  if (!payload) {
+    return (
+      <section className="relative rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-outline-variant/15 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+        <h3 className="text-2xl font-extrabold tracking-tight mb-2">Peer & Risk Intelligence</h3>
+        <p className="text-sm text-on-surface-variant">No score analysis data is available yet.</p>
+      </section>
+    );
+  }
 
-  const benchmarkLadder = [
-    { label: 'Top 10%', value: 790 },
-    { label: 'Top 25%', value: 760 },
-    { label: 'Median', value: 705 },
-    { label: 'Bottom 25%', value: 640 },
-  ];
+  const score = Number(payload.score ?? 0);
+  const averageScore = Number(payload.average_score ?? 0);
+  const delta = Number(payload.peer_delta ?? score - averageScore);
+  const percentile = Number(payload.percentile ?? 0);
+  const riskRegime = payload.risk_regime || 'Unknown';
+  const volatility = payload?.summary?.volatility_index;
+
+  const factors = Array.isArray(payload.factors) ? payload.factors : [];
+  const weakestFactors = [...factors]
+    .sort((a, b) => (Number(a?.normalized_value) || 0) - (Number(b?.normalized_value) || 0))
+    .slice(0, 3);
 
   const deltaTextClass = delta >= 0 ? 'text-tertiary' : 'text-error';
 
@@ -55,7 +60,7 @@ const ScoreAnalysis = ({ score }) => {
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-outline-variant/15 bg-surface-container-high backdrop-blur-md">
           <span className="material-symbols-outlined text-[14px] text-tertiary">compare_arrows</span>
-          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant">Comparative Engine</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant">Live Backend Metrics</span>
         </div>
       </div>
 
@@ -71,54 +76,45 @@ const ScoreAnalysis = ({ score }) => {
         <div className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Peer Delta</p>
           <p className={`text-4xl font-extrabold tracking-tight ${deltaTextClass}`}>{delta >= 0 ? `+${delta}` : delta}</p>
-          <p className="text-xs text-on-surface-variant mt-3">Vs avg wallet score ({averageScore})</p>
+          <p className="text-xs text-on-surface-variant mt-3">Vs backend average score ({averageScore})</p>
         </div>
 
         <div className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Risk Regime</p>
-          <p className="text-3xl font-extrabold tracking-tight text-on-surface">Stable</p>
-          <p className="text-xs text-on-surface-variant mt-3">Predictive drift remains low.</p>
+          <p className="text-3xl font-extrabold tracking-tight text-on-surface">{riskRegime}</p>
+          <p className="text-xs text-on-surface-variant mt-3">Volatility index: {typeof volatility === 'number' ? volatility.toFixed(1) : 'N/A'}</p>
         </div>
       </div>
 
       <div className="relative z-10 mb-10">
         <div className="flex items-center gap-2 mb-4">
           <span className="material-symbols-outlined text-on-surface-variant text-sm">lightbulb</span>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant/80">Factor Insights</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant/80">Lowest Factors</h3>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {insights.map((insight) => (
-            <div key={insight.factor} className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
+          {weakestFactors.map((factor) => (
+            <div key={factor.name} className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
               <div className="flex items-center gap-3 mb-4">
-                <span className="material-symbols-outlined text-[20px]" style={{ color: insight.color }}>{insight.icon}</span>
-                <h4 className="text-base font-bold text-on-surface/90">{insight.factor}</h4>
+                <span className="material-symbols-outlined text-[20px]" style={{ color: factor.color }}>{factor.icon}</span>
+                <h4 className="text-base font-bold text-on-surface/90">{factor.name}</h4>
               </div>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: insight.color }}>Impact: {insight.impact}</p>
-              <p className="text-xs text-on-surface-variant leading-relaxed">{insight.suggestion}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: factor.color }}>Score: {factor.score}</p>
+              <p className="text-xs text-on-surface-variant leading-relaxed">{suggestionForFactor(factor.name)}</p>
             </div>
           ))}
         </div>
       </div>
 
       <div className="relative z-10 rounded-2xl bg-gradient-to-b from-surface-container-high/80 to-surface/40 p-6 sm:p-8 border border-outline-variant/15">
-        <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-4 md:gap-8">
           <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-surface-bright/10 border border-outline-variant/15">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-3">Your Score</span>
             <span className="text-tertiary text-5xl md:text-7xl font-black tracking-tighter">{score}</span>
           </div>
           <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-black/20 border border-outline-variant/15">
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-3">Network Avg</span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-3">Backend Avg</span>
             <span className="text-on-surface-variant text-5xl md:text-7xl font-black tracking-tighter">{averageScore}</span>
           </div>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2">
-          {benchmarkLadder.map((tier) => (
-            <div key={tier.label} className="flex flex-col items-center pt-4 border-t border-outline-variant/15 opacity-60 hover:opacity-100 transition-opacity">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant mb-1 text-center">{tier.label}</span>
-              <span className="text-xs font-mono text-on-surface/50">{tier.value}</span>
-            </div>
-          ))}
         </div>
       </div>
     </section>
