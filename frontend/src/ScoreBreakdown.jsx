@@ -26,55 +26,7 @@ const toPercent = (factor) => {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-const monthCountFromSummary = (summary) => {
-  const ageDays = Number(summary?.account_age_days);
-  if (!Number.isFinite(ageDays) || ageDays <= 0) {
-    return 36;
-  }
-  return clamp(Math.round(ageDays / 30), 12, 180);
-};
-
-const deterministicPhase = (name) => {
-  const text = String(name || '');
-  let hash = 0;
-  for (let i = 0; i < text.length; i += 1) {
-    hash += text.charCodeAt(i);
-  }
-  return (hash % 360) * (Math.PI / 180);
-};
-
-const buildAllTimeCurve = (factor, normalizedPercent, summary) => {
-  const points = monthCountFromSummary(summary);
-  const factorScore = clamp(Number(factor?.score) || normalizedPercent, 0, 100);
-  const phase = deterministicPhase(factor?.name);
-  const baseline = Math.max(2, Math.round(factorScore * 0.08));
-
-  let growthExponent = 0.9;
-  if (factorScore >= 70) {
-    growthExponent = 0.72;
-  } else if (factorScore <= 35) {
-    growthExponent = 1.15;
-  }
-
-  let volatility = 0.08;
-  if (factor?.name === 'Wallet Balance') {
-    volatility = 0.17;
-  } else if (factor?.name === 'NFT Holdings') {
-    volatility = 0.14;
-  } else if (factor?.name === 'Transaction History') {
-    volatility = 0.11;
-  }
-
-  return Array.from({ length: points }, (_, index) => {
-    const ratio = (index + 1) / points;
-    const growth = Math.pow(ratio, growthExponent);
-    const swing = Math.sin(ratio * 3.8 * Math.PI + phase) * (factorScore * volatility * (1 - ratio) * 0.35);
-    const value = baseline + (factorScore * growth) + swing;
-    return clamp(value, 0, 100);
-  });
-};
-
-const toSeries = (factor, normalizedPercent, summary) => {
+const toSeries = (factor, normalizedPercent) => {
   if (Array.isArray(factor?.trend) && factor.trend.length > 1) {
     return factor.trend.map((point) => {
       const numeric = Number(point);
@@ -84,7 +36,14 @@ const toSeries = (factor, normalizedPercent, summary) => {
       return Math.max(0, Math.min(100, numeric));
     });
   }
-  return buildAllTimeCurve(factor, normalizedPercent, summary);
+  if (Array.isArray(factor?.trend) && factor.trend.length === 1) {
+    const onlyPoint = Number(factor.trend[0]);
+    if (Number.isFinite(onlyPoint)) {
+      const bounded = Math.max(0, Math.min(100, onlyPoint));
+      return [bounded, bounded];
+    }
+  }
+  return [];
 };
 
 const chartOptionsForSeries = (series) => {
@@ -218,7 +177,7 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 relative z-10">
         {safeFactors.map((factor, index) => {
           const normalizedPercent = toPercent(factor);
-          const series = toSeries(factor, normalizedPercent, summary);
+          const series = toSeries(factor, normalizedPercent);
           const chartOptions = chartOptionsForSeries(series);
           const chartData = {
             labels: Array.from({ length: series.length }, () => ''),
@@ -290,7 +249,13 @@ const ScoreBreakdown = ({ factors, summary, warnings }) => {
               <div className="rounded-md bg-surface-container p-2">
                 <p className="text-[10px] font-mono uppercase tracking-wider text-on-surface-variant mb-1">All-Time Factor Graph</p>
                 <div className="h-[64px] w-full">
-                  <Line data={chartData} options={chartOptions} />
+                  {series.length > 1 ? (
+                    <Line data={chartData} options={chartOptions} />
+                  ) : (
+                    <div className="h-full flex items-center justify-start text-[11px] text-on-surface-variant">
+                      No verified all-time history returned by current providers.
+                    </div>
+                  )}
                 </div>
               </div>
             </article>
