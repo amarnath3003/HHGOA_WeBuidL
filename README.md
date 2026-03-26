@@ -1,106 +1,106 @@
 # EtherScore
 
-On-chain wallet credit scoring dashboard with a React frontend and a Python backend API.
+> **On-chain credit intelligence dashboard** for EVM wallets.  
+> FastAPI backend + React frontend + explainable score diagnostics.
 
-EtherScore computes a wallet score from live Ethereum data (ETH + USDT balances, NFT holdings, transaction history, account age, and token diversity), then visualizes diagnostics in a modern UI.
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-20232A?logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 
-## Table of Contents
+## Why EtherScore
 
-- [Overview](#overview)
-- [How Scoring Works](#how-scoring-works)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Quick Start](#quick-start)
-- [Environment Variables](#environment-variables)
-- [API Reference](#api-reference)
-- [Troubleshooting](#troubleshooting)
-- [Roadmap](#roadmap)
-- [License](#license)
+Traditional credit rails miss users who are active on-chain. EtherScore transforms wallet behavior into a transparent credit-style score and a rich diagnostic view.
 
-## Overview
+## What’s Live Now
 
-Traditional credit systems miss users who are financially active on-chain but invisible in legacy credit rails.
+- **FastAPI backend (`v2`)** with OpenAPI docs and structured error responses.
+- **Multi-chain-ready scoring engine** (`ethereum`, `polygon`, `bsc`, `arbitrum`) with partial-failure handling.
+- **Model-based score generation** using `credit_scoring_dataset.csv` and weighted feature calibration.
+- **Rate limiting + request tracing** (`X-Request-ID`, `X-Process-Time-Ms`) for production-style observability.
+- **Modern UI diagnostics** (speedometer, factor matrix, peer delta, percentile, risk regime, volatility).
 
-EtherScore addresses this by:
+## Scoring Inputs
 
-- Pulling wallet signals from public blockchain APIs.
-- Computing a weighted score in the `300–850` range.
-- Returning transparent factor-by-factor breakdowns.
-- Displaying risk and trust diagnostics in a browser dashboard.
+The score is normalized into the **300–850** range using these weighted factors:
 
-## How Scoring Works
-
-Backend scoring currently uses five weighted factors:
-
-| Factor | Weight | Signal |
+| Factor | Weight | Core Signal |
 | --- | ---: | --- |
-| Wallet Balance | 30% | ETH + USDT value in USD |
-| Transaction History | 25% | Transaction count |
-| NFT Holdings | 20% | NFT ownership volume |
-| Account Age | 15% | Estimated wallet age |
-| Network Diversity | 10% | Token diversity |
+| Wallet Balance | 30% | Native + USDT value (USD) |
+| Transaction History | 25% | Behavioral activity volume |
+| NFT Holdings | 20% | NFT ownership depth |
+| Account Age | 15% | Wallet longevity |
+| Network Diversity | 10% | Cross-chain/token diversity |
 
-The normalized weighted total is mapped into the `300–850` range, and the API also returns:
+Returned payloads also include `score_band`, `trust_level`, `risk_regime`, `average_score`, `peer_delta`, `percentile`, `summary`, `factors`, `featured_collections`, and `meta` telemetry.
 
-- `score_band` (e.g., Good, Very Good)
-- `trust_level` (Low → High)
-- `risk_regime` (Stable / Balanced / Watchlist)
-- `summary`, `factors`, and `featured_collections`
+## Architecture
 
-## Tech Stack
-
-### Frontend
-
-- React 18 + Vite
-- Tailwind CSS
-- Chart.js / react-chartjs-2
-- MetaMask integration (`@metamask/detect-provider`, `web3`)
-
-### Backend
-
-- Python 3 (standard-library HTTP server)
-- JSON-RPC calls to Ethereum endpoints
-- External APIs for ETH price, NFTs, ENS, and optional Etherscan fallback
+```text
+frontend (React + Vite)
+	 │  POST /api/score
+	 ▼
+backend/main.py (FastAPI)
+	 │  delegates scoring
+	 ▼
+backend/data_processing.py
+	 ├─ RPC + explorer/NFT/price aggregation
+	 ├─ credit model inference
+	 └─ explainable factor payload assembly
+```
 
 ## Project Structure
 
 ```text
 backend/
-	main.py                 # HTTP API server
-	data_processing.py      # Wallet data fetch + scoring logic
+	main.py                     # FastAPI app, middleware, endpoints, rate limit
+	data_processing.py          # Multi-chain ingestion + model scoring
+	credit_scoring_dataset.csv  # Training/reference dataset
+	tests/
+		test_api.py
+		test_data_processing.py
 
 frontend/
 	src/
-		App.jsx               # Main application flow
+		App.jsx
 		CreditScoreSpeedometer.jsx
-		WalletSummary.jsx
 		ScoreBreakdown.jsx
 		ScoreAnalysis.jsx
+		WalletSummary.jsx
 ```
 
 ## Quick Start
 
 ### 1) Prerequisites
 
-- Python 3.10+
-- Node.js 18+ and npm
-- MetaMask (or another injected Ethereum provider)
+- Python **3.10+**
+- Node.js **18+**
+- npm
+- MetaMask (or compatible injected wallet)
 
-### 2) Run Backend
+### 2) Backend
 
-From repository root:
+From repo root:
 
 ```bash
+pip install -r backend/requirements.txt
 python backend/main.py --host 127.0.0.1 --port 8000
 ```
 
-Backend health check:
+Health checks:
 
 ```bash
 curl http://127.0.0.1:8000/api/health
+curl "http://127.0.0.1:8000/api/chains?deep=true"
 ```
 
-### 3) Run Frontend
+Interactive API docs:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### 3) Frontend
 
 ```bash
 cd frontend
@@ -108,36 +108,67 @@ npm install
 npm run dev
 ```
 
-Open: `http://localhost:5173`
+Open:
 
-If backend is not on `http://127.0.0.1:8000`, set:
-
-```bash
-VITE_API_BASE_URL=http://127.0.0.1:8000
+```text
+http://localhost:5173
 ```
 
-in `frontend/.env`.
+## API Snapshot
+
+Base URL: `http://127.0.0.1:8000`
+
+- `GET /api/health`
+- `GET /api/health?deep=true`
+- `GET /api/chains`
+- `GET /api/chains?deep=true`
+- `POST /api/score`
+- `GET /api/score/{wallet_address}`
+
+### Legacy-compatible request
+
+```json
+{
+	"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+}
+```
+
+### Extended multi-chain request
+
+```json
+{
+	"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+	"chains": ["ethereum", "polygon", "bsc", "arbitrum"]
+}
+```
 
 ## Environment Variables
 
-### Backend (optional)
+### Backend essentials
 
-Set these in your shell before starting `backend/main.py`:
+| Variable | Purpose |
+| --- | --- |
+| `ETHERSCORE_HOST` | API bind host (default `127.0.0.1`) |
+| `ETHERSCORE_PORT` | API bind port (default `8000`) |
+| `ETHERSCORE_CORS_ORIGINS` | Allowed CORS origins (comma-separated or `*`) |
+| `ETHERSCORE_RATE_LIMIT_PER_MINUTE` | Rate limit quota (default `60`) |
+| `ETHERSCORE_RATE_LIMIT_WINDOW_SECONDS` | Rate limit window (default `60`) |
 
-| Variable | Purpose | Default |
-| --- | --- | --- |
-| `ETHERSCORE_HOST` | API bind host | `127.0.0.1` |
-| `ETHERSCORE_PORT` | API bind port | `8000` |
-| `ETHERSCORE_RPC_URL` | Primary Ethereum RPC endpoint | unset |
-| `ETHERSCORE_NFT_API_URL` | NFT ownership API | Alchemy demo endpoint |
-| `ETHERSCORE_ENS_API_URL` | ENS resolution API | `https://api.ensideas.com/ens/resolve` |
-| `ETHERSCORE_ETH_PRICE_API_URL` | ETH price feed | CoinGecko simple price endpoint |
-| `ETHERSCORE_FALLBACK_ETH_PRICE_USD` | Fallback ETH price | `3000` |
-| `ETHERSCORE_FALLBACK_NFT_FLOOR_USD` | Fallback NFT valuation | `120` |
-| `ETHERSCORE_REQUEST_TIMEOUT_SECONDS` | Upstream timeout | `12` |
-| `ETHERSCORE_CACHE_TTL_SECONDS` | Score payload cache TTL | `120` |
-| `ETHERSCORE_HTTP_USER_AGENT` | User-Agent header | `EtherScoreBackend/2.0 (+local)` |
-| `ETHERSCORE_ETHERSCAN_API_KEY` | Optional account-age fallback | unset |
+### Chain RPC configuration
+
+Set at least one RPC endpoint:
+
+- `ETHERSCORE_RPC_URL_ETHEREUM`
+- `ETHERSCORE_RPC_URL_POLYGON`
+- `ETHERSCORE_RPC_URL_BSC`
+- `ETHERSCORE_RPC_URL_ARBITRUM`
+
+Optional model/data tuning:
+
+- `ETHERSCORE_CREDIT_MODEL_DATASET_PATH`
+- `ETHERSCORE_CACHE_TTL_SECONDS`
+- `ETHERSCORE_REQUEST_TIMEOUT_SECONDS`
+- `ETHERSCORE_UPSTREAM_RETRY_COUNT`
 
 ### Frontend
 
@@ -145,53 +176,23 @@ Set these in your shell before starting `backend/main.py`:
 | --- | --- | --- |
 | `VITE_API_BASE_URL` | Backend API base URL | `http://127.0.0.1:8000` |
 
-## API Reference
+## Development & Tests
 
-Base URL: `http://127.0.0.1:8000`
+Backend tests:
 
-### `GET /api/health`
-
-Returns server status.
-
-### `POST /api/score`
-
-Request body:
-
-```json
-{
-	"address": "0x0000000000000000000000000000000000000000"
-}
+```bash
+pytest backend/tests -q
 ```
 
-Response includes:
+Frontend scripts:
 
-- `score`, `score_band`, `trust_level`, `risk_regime`
-- `summary` (balances, counts, sources, volatility)
-- `factors` (weight, score, trend, display value)
-- `featured_collections`
-
-### `GET /api/score/<wallet_address>`
-
-Equivalent to `POST /api/score`, but wallet address is passed in the URL path.
-
-### Error Behavior
-
-- `400` for invalid addresses or malformed JSON.
-- `502` when upstream providers fail (RPC/API unavailable).
-
-## Troubleshooting
-
-- **MetaMask not detected**: confirm extension is installed and unlocked.
-- **Score request fails**: verify backend is running and `VITE_API_BASE_URL` is correct.
-- **Frequent upstream errors**: set `ETHERSCORE_RPC_URL` to a reliable RPC provider key.
-- **Slow responses**: external APIs may rate-limit demo endpoints; use production API keys where possible.
-
-## Roadmap
-
-- Add multi-chain support beyond Ethereum mainnet.
-- Improve explainability with historical score snapshots.
-- Introduce model calibration against larger wallet cohorts.
+```bash
+cd frontend
+npm run dev
+npm run build
+npm run preview
+```
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
