@@ -65,7 +65,7 @@ function App() {
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload.error || 'Unable to calculate credit score.');
+        throw new Error(payload.message || payload.error || 'Unable to calculate credit score.');
       }
 
       setCreditScore(payload.score);

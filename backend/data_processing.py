@@ -14,6 +14,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - optional at import time
+    load_dotenv = None  # type: ignore[assignment]
+
+if load_dotenv is not None:
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+
 
 ETH_ADDRESS_PATTERN = re.compile(r"^0x[a-fA-F0-9]{40}$")
 RETRYABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
@@ -30,6 +38,9 @@ ETH_PRICE_API_URL = os.getenv(
 )
 ENS_API_URL = os.getenv("ETHERSCORE_ENS_API_URL", "https://api.ensideas.com/ens/resolve")
 ETHERSCAN_API_URL = os.getenv("ETHERSCORE_ETHERSCAN_API_URL", "https://api.etherscan.io/api")
+DEFAULT_ETH_INFURA_RPC = "https://mainnet.infura.io/v3/84842078b09946638c03157f83405213"
+DEFAULT_ETH_ALCHEMY_RPC = "https://eth-mainnet.g.alchemy.com/v2/demo"
+DEFAULT_ETH_NFT_API = "https://eth-mainnet.g.alchemy.com/nft/v3/demo/getNFTsForOwner"
 
 
 class ExternalServiceError(RuntimeError):
@@ -56,7 +67,9 @@ class ChainSpec:
     usdt_contract: str
     usdt_decimals: int = 6
     legacy_rpc_env_var: str | None = None
+    default_rpc_candidates: tuple[str, ...] = ()
     nft_env_var: str | None = None
+    default_nft_endpoint: str | None = None
     supports_ens: bool = False
     supports_etherscan_age: bool = False
 
@@ -167,7 +180,9 @@ CHAIN_SPECS: dict[str, ChainSpec] = {
         price_key="ethereum",
         usdt_contract="0xdAC17F958D2ee523a2206206994597C13D831ec7",
         legacy_rpc_env_var="ETHERSCORE_RPC_URL",
+        default_rpc_candidates=(DEFAULT_ETH_ALCHEMY_RPC, DEFAULT_ETH_INFURA_RPC),
         nft_env_var="ETHERSCORE_NFT_API_URL_ETHEREUM",
+        default_nft_endpoint=DEFAULT_ETH_NFT_API,
         supports_ens=True,
         supports_etherscan_age=True,
     ),
@@ -248,9 +263,16 @@ def _model_dataset_path() -> Path:
     configured = os.getenv("ETHERSCORE_CREDIT_MODEL_DATASET_PATH", "").strip()
     if configured:
         candidate = Path(configured).expanduser()
-        if not candidate.is_absolute():
-            candidate = (Path(__file__).resolve().parent / candidate).resolve()
-        return candidate
+        if candidate.is_absolute():
+            return candidate
+
+        # Prefer paths resolved from repository root/cwd when explicitly configured,
+        # then fall back to module-relative resolution.
+        cwd_candidate = (Path.cwd() / candidate).resolve()
+        if cwd_candidate.exists():
+            return cwd_candidate
+
+        return (Path(__file__).resolve().parent / candidate).resolve()
 
     return Path(__file__).resolve().parent / "credit_scoring_dataset.csv"
 
@@ -547,6 +569,10 @@ def _rpc_candidates(spec: ChainSpec) -> list[str]:
         if legacy_value:
             candidates.append(legacy_value)
 
+    for default_candidate in spec.default_rpc_candidates:
+        if default_candidate:
+            candidates.append(default_candidate)
+
     unique_candidates: list[str] = []
     for candidate in candidates:
         if candidate not in unique_candidates:
@@ -567,6 +593,8 @@ def _nft_endpoint_candidates(spec: ChainSpec) -> list[str]:
         legacy = os.getenv("ETHERSCORE_NFT_API_URL", "").strip()
         if legacy:
             candidates.append(legacy)
+        if spec.default_nft_endpoint:
+            candidates.append(spec.default_nft_endpoint)
 
     unique_candidates: list[str] = []
     for candidate in candidates:
