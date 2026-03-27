@@ -16,6 +16,7 @@ function App() {
   const [walletData, setWalletData] = useState(null);
   const [isLoadingScore, setIsLoadingScore] = useState(false);
   const [scoreError, setScoreError] = useState('');
+  const [hasRequestedScore, setHasRequestedScore] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -37,6 +38,7 @@ function App() {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const accounts = await web3.eth.getAccounts();
         setAddress(accounts[0]);
+        setHasRequestedScore(false);
         setScoreError('');
       } catch (error) {
         console.error("User denied account access");
@@ -51,6 +53,7 @@ function App() {
       return;
     }
 
+    setHasRequestedScore(true);
     setIsLoadingScore(true);
     setScoreError('');
 
@@ -118,7 +121,7 @@ function App() {
             </section>
           )}
 
-          {address && (
+          {address && !hasRequestedScore && (
             <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <button
                 onClick={getCreditScore}
@@ -127,7 +130,7 @@ function App() {
               >
                 <div className="absolute inset-0 w-full h-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                 <span className="relative z-10">
-                  {isLoadingScore ? 'Calculating Score...' : creditScore ? 'Recalculate Credit Score' : 'Generate Credit Score'}
+                  {isLoadingScore ? 'Calculating Score...' : 'Generate Credit Score'}
                 </span>
               </button>
             </section>

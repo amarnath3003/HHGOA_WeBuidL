@@ -64,44 +64,65 @@ const ScoreAnalysis = ({ payload }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10 mb-10">
-        <div className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Percentile Rank</p>
-          <div className="flex items-baseline gap-1">
-            <p className="text-4xl font-extrabold tracking-tight text-on-surface">{percentile}</p>
-            <span className="text-sm font-bold text-tertiary">%</span>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 relative z-10 mb-8 sm:mb-10">
+        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/10 shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:bg-surface-container-highest hover:border-tertiary/40 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(205,189,255,0.15)] transition-all duration-300 overflow-hidden cursor-default">
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-tertiary/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          <div className="relative z-10">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-tertiary/80 transition-colors">Percentile Rank</p>
+            <div className="flex items-baseline gap-1">
+              <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-on-surface">{percentile}</p>
+              <span className="text-xs sm:text-sm font-bold text-tertiary">%</span>
+            </div>
+            <p className="text-[11px] sm:text-xs text-on-surface-variant mt-2 leading-relaxed">Your ranking compared to all monitored addresses.</p>
           </div>
         </div>
 
-        <div className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Peer Delta</p>
-          <p className={`text-4xl font-extrabold tracking-tight ${deltaTextClass}`}>{delta >= 0 ? `+${delta}` : delta}</p>
-          <p className="text-xs text-on-surface-variant mt-3">Vs backend average score ({averageScore})</p>
+        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/10 shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:bg-surface-container-highest hover:border-[currentColor]/40 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-all duration-300 overflow-hidden cursor-default" style={{ color: delta >= 0 ? '#cdbdff' : '#ffb4ab' }}>
+          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: delta >= 0 ? 'rgba(205,189,255,0.1)' : 'rgba(255,180,171,0.1)' }}></div>
+          <div className="relative z-10">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-current transition-colors">Peer Delta</p>
+            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-current">{delta >= 0 ? `+${delta}` : delta}</p>
+            <p className="text-[11px] sm:text-xs text-on-surface-variant mt-2 leading-relaxed">Variance vs average base score ({averageScore}).</p>
+          </div>
         </div>
 
-        <div className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant mb-2">Risk Regime</p>
-          <p className="text-3xl font-extrabold tracking-tight text-on-surface">{riskRegime}</p>
-          <p className="text-xs text-on-surface-variant mt-3">Volatility index: {typeof volatility === 'number' ? volatility.toFixed(1) : 'N/A'}</p>
+        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/10 shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:bg-surface-container-highest hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(177,197,255,0.12)] transition-all duration-300 overflow-hidden cursor-default">
+          <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          <div className="relative z-10">
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-primary/80 transition-colors">Risk Regime</p>
+            <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-on-surface truncate">{riskRegime}</p>
+            <p className="text-[11px] sm:text-xs text-on-surface-variant mt-2 leading-relaxed">System volatility index tracking at {typeof volatility === 'number' ? volatility.toFixed(1) : 'N/A'}.</p>
+          </div>
         </div>
       </div>
 
-      <div className="relative z-10 mb-10">
+      <div className="relative z-10 mb-8 sm:mb-10">
         <div className="flex items-center gap-2 mb-4">
-          <span className="material-symbols-outlined text-on-surface-variant text-sm">lightbulb</span>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant/80">Lowest Factors</h3>
+          <span className="material-symbols-outlined text-primary text-sm animate-pulse-glow">lightbulb</span>
+          <h3 className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-on-surface-variant/80">Opportunity Areas</h3>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {weakestFactors.map((factor) => (
-            <div key={factor.name} className="rounded-xl bg-surface-container-high/90 backdrop-blur-sm p-6 border border-outline-variant/15">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="material-symbols-outlined text-[20px]" style={{ color: factor.color }}>{factor.icon}</span>
-                <h4 className="text-base font-bold text-on-surface/90">{factor.name}</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {weakestFactors.map((factor) => {
+            const accent = factor?.color || '#b1c5ff';
+            return (
+              <div key={factor.name} className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/10 shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:border-outline-variant/40 hover:bg-surface-container-highest hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-300 cursor-default overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ backgroundColor: `${accent}2A` }}></div>
+                
+                <div className="relative z-10 flex items-center justify-between mb-3 gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex shrink-0 items-center justify-center w-8 h-8 rounded-lg bg-surface-container border border-outline-variant/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] group-hover:scale-105 transition-transform duration-300" style={{ color: accent }}>
+                      <span className="material-symbols-outlined text-[16px]">{factor.icon}</span>
+                    </div>
+                    <h4 className="text-[13px] sm:text-sm font-bold text-on-surface/90 truncate">{factor.name}</h4>
+                  </div>
+                  <div className="shrink-0 px-2 py-0.5 rounded-md bg-surface-container/80 backdrop-blur-md border border-outline-variant/10" style={{ color: accent }}>
+                    <span className="text-[10px] sm:text-[11px] font-bold">{factor.score}</span>
+                  </div>
+                </div>
+                <p className="relative z-10 text-[11px] sm:text-xs text-on-surface-variant leading-relaxed">{suggestionForFactor(factor.name)}</p>
               </div>
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: factor.color }}>Score: {factor.score}</p>
-              <p className="text-xs text-on-surface-variant leading-relaxed">{suggestionForFactor(factor.name)}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
