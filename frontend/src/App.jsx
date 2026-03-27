@@ -81,21 +81,21 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-background/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-4 bg-background/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
         <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
-            <h1 className="text-xl font-bold tracking-tighter text-tertiary-fixed-dim">EtherScore</h1>
+          <div className="flex items-center gap-3">
+            <span className="brand-logo-orb material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
+            <h1 className="brand-title text-2xl sm:text-[1.7rem] font-black tracking-tight">EtherScore</h1>
           </div>
 
           <div className="flex items-center gap-3">
             {!address ? (
               <button
                 onClick={connectWallet}
-                className="rounded-full px-4 py-2 bg-primary-container text-on-surface text-xs font-semibold hover:shadow-[0_8px_30px_rgba(0,81,195,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-1.5"
+                className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 bg-tertiary-container text-tertiary-fixed text-sm sm:text-base font-semibold shadow-[0_8px_28px_rgba(98,42,228,0.45)] hover:shadow-[0_10px_34px_rgba(98,42,228,0.62)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-2"
               >
-                <span className="material-symbols-outlined text-sm">shield</span>
-                Connect
+                <span className="material-symbols-outlined text-base sm:text-lg">shield</span>
+                Connect Wallet
               </button>
             ) : (
               <div className="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full hover:bg-surface-container-highest hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 group cursor-pointer">
@@ -103,29 +103,27 @@ function App() {
                 <span className="font-mono text-xs tracking-tight text-on-surface-variant group-hover:text-on-surface transition-colors">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
               </div>
             )}
-
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high hover:-rotate-90 hover:scale-110 transition-all duration-500 active:scale-95 active:rotate-0" type="button" aria-label="Settings">
-              <span className="material-symbols-outlined text-on-surface-variant">settings</span>
-            </button>
           </div>
         </div>
       </header>
 
       <main className="pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="mx-auto w-full max-w-7xl space-y-8">
-          <section className="flex justify-center">
-            <div className="flex items-center gap-2 px-4 py-1.5 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_15px_rgba(205,189,255,0.25)]">
-              <span className="material-symbols-outlined text-tertiary-fixed-dim text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
-              <span className="text-tertiary-fixed-dim text-[11px] sm:text-xs uppercase tracking-widest font-mono">Nada AI Protected</span>
-            </div>
-          </section>
+          {!address && (
+            <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+              <div className="flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_22px_rgba(205,189,255,0.38)]">
+                <span className="material-symbols-outlined text-tertiary-fixed-dim text-base sm:text-lg" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+                <span className="text-tertiary-fixed-dim text-sm sm:text-base uppercase tracking-[0.2em] font-mono">Nada AI Protected</span>
+              </div>
+            </section>
+          )}
 
           {address && (
             <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <button
                 onClick={getCreditScore}
                 disabled={isLoadingScore}
-                className="relative overflow-hidden group w-full max-w-md rounded-full py-3 px-6 bg-primary hover:bg-primary-fixed transition-all text-on-primary font-bold tracking-wide hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(177,197,255,0.4)] active:scale-95 active:translate-y-0 duration-300"
+                className="score-cta-button relative overflow-hidden group w-full max-w-lg rounded-full py-4 sm:py-5 px-8 bg-tertiary-container transition-all text-tertiary-fixed text-base sm:text-lg font-bold tracking-wide hover:-translate-y-1 active:scale-95 active:translate-y-0 duration-300"
               >
                 <div className="absolute inset-0 w-full h-full bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                 <span className="relative z-10">
@@ -142,8 +140,8 @@ function App() {
           )}
 
           {!address && (
-            <section className="mt-10 max-w-2xl mx-auto text-center text-on-surface-variant">
-              <p className="text-sm md:text-base">Connect your wallet to initialize privacy-preserving score computation and unlock your on-chain credit intelligence dashboard.</p>
+            <section className="mt-8 sm:mt-10 max-w-3xl mx-auto text-center text-on-surface-variant opacity-0 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
+              <p className="text-lg sm:text-2xl leading-relaxed sm:leading-relaxed">Connect your wallet to initialize privacy-preserving score computation and unlock your on-chain credit intelligence dashboard.</p>
             </section>
           )}
 
