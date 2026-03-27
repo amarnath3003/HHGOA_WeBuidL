@@ -9,7 +9,7 @@
 ![React](https://img.shields.io/badge/React-18-20232A?logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 
- ![Alt text](frontend/src/nfts/White & Green Mobile Mockup Photo Collage Beauty Facebook Post.png)
+![Alt text](frontend/src/nfts/White%20%26%20Green%20Mobile%20Mockup%20Photo%20Collage%20Beauty%20Facebook%20Post.png)
 
 
 ## Why EtherScore
