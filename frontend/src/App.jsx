@@ -6,6 +6,8 @@ import WalletSummary from './WalletSummary.jsx';
 import ScoreBreakdown from './ScoreBreakdown.jsx';
 import ScoreAnalysis from './ScoreAnalysis.jsx';
 import './App.css';
+import nft1 from './nfts/nft1.jpg';
+import nft2 from './nfts/nft2.png';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
@@ -68,7 +70,7 @@ function App() {
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload.message || payload.error || 'Unable to calculate credit score.');
+        throw new Error(payload.error || 'Unable to calculate credit score.');
       }
 
       setCreditScore(payload.score);
@@ -83,8 +85,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-4 bg-background/80 backdrop-blur-xl shadow-[0px_0px_40px_0px_rgba(177,197,255,0.06)]">
+    <div className="min-h-screen relative z-0 overflow-hidden bg-surface-container-lowest text-on-surface font-body pb-32 selection:bg-primary selection:text-on-primary">
+      <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+      <div className="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-tertiary/10 rounded-full blur-[140px] -z-10"></div>
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 sm:px-6 py-4 bg-background/90 backdrop-blur-xl border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
         <div className="mx-auto w-full max-w-7xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="brand-logo-orb material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>security</span>
@@ -114,7 +118,7 @@ function App() {
         <div className="mx-auto w-full max-w-7xl space-y-8">
           {!address && (
             <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-              <div className="flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-tertiary/5 backdrop-blur-md rounded-full border border-tertiary/30 shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(205,189,255,0.15)] group hover:bg-tertiary/10 hover:border-tertiary/50 transition-all duration-500">
+              <div className="flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-tertiary/20 backdrop-blur-md rounded-full border border-tertiary/30 shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(205,189,255,0.15)] group hover:bg-tertiary/30 hover:border-tertiary/50 transition-all duration-500">
                 <span className="material-symbols-outlined text-tertiary-fixed-dim text-base sm:text-lg drop-shadow-[0_0_8px_rgba(205,189,255,0.5)] group-hover:scale-110 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
                 <span className="text-tertiary-fixed-dim text-sm sm:text-base uppercase tracking-[0.2em] font-mono font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-tertiary-fixed to-primary-fixed">Nada AI Protected</span>
               </div>
@@ -162,11 +166,11 @@ function App() {
               </div>
 
               <section className="grid grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                <div className="p-5 rounded-2xl bg-surface-container-high/40 backdrop-blur-xl border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] group hover:border-outline-variant/50 hover:bg-surface-container-highest/40 hover:shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-500 space-y-1">
+                <div className="p-5 rounded-2xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] group hover:bg-white/10 hover:border-white/20 transition-all duration-500 space-y-1">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
                   <div className="text-xl sm:text-2xl font-black text-on-surface tracking-tight group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-surface-variant transition-all duration-300">{walletData?.summary?.total_assets_display || '$0.00'}</div>
                 </div>
-                <div className="p-5 rounded-2xl bg-surface-container-high/40 backdrop-blur-xl border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] group hover:border-outline-variant/50 hover:bg-surface-container-highest/40 hover:shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-500 space-y-1">
+                <div className="p-5 rounded-2xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] group hover:bg-white/10 hover:border-white/20 transition-all duration-500 space-y-1">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
                   <div className="text-xl sm:text-2xl font-black text-tertiary-fixed-dim tracking-tight group-hover:shadow-glow transition-all duration-300">{walletData?.trust_level || 'Pending'}</div>
                 </div>
@@ -196,7 +200,7 @@ function App() {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-background/70 backdrop-blur-3xl rounded-t-[2.5rem] border-t border-outline-variant/30 shadow-[0_-8px_32px_rgba(0,0,0,0.4),inset_0_1px_rgba(255,255,255,0.05)] text-center w-full max-w-lg mx-auto sm:mb-6 sm:rounded-full sm:border">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-background/95 backdrop-blur-3xl rounded-t-[2.5rem] border-t border-outline-variant/30 shadow-[0_-8px_32px_rgba(0,0,0,0.4),inset_0_1px_rgba(255,255,255,0.05)] text-center w-full max-w-lg mx-auto sm:mb-6 sm:rounded-full sm:border">
         <div className="w-full flex justify-around items-center gap-1 sm:gap-4 px-2">
           <button className="group relative flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/15 shadow-[inset_0_1px_rgba(255,255,255,0.2)] rounded-2xl sm:rounded-full px-5 py-2.5 sm:px-6 sm:py-3 transition-all duration-300 hover:shadow-[0_0_24px_rgba(205,189,255,0.4),inset_0_1px_rgba(255,255,255,0.3)] hover:-translate-y-1 active:scale-95">
             <span className="material-symbols-outlined text-xl sm:text-2xl transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(205,189,255,0.6)]" style={{fontVariationSettings: "'FILL' 1"}}>home</span>

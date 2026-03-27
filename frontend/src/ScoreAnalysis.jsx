@@ -22,7 +22,7 @@ const suggestionForFactor = (factorName) => {
 const ScoreAnalysis = ({ payload }) => {
   if (!payload) {
     return (
-      <section className="relative rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-outline-variant/15 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+      <section className="relative rounded-2xl bg-surface-container/50 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] overflow-hidden">
         <h3 className="text-2xl font-extrabold tracking-tight mb-2">Peer & Risk Intelligence</h3>
         <p className="text-sm text-on-surface-variant">No score analysis data is available yet.</p>
       </section>
@@ -44,7 +44,7 @@ const ScoreAnalysis = ({ payload }) => {
   const deltaTextClass = delta >= 0 ? 'text-tertiary' : 'text-error';
 
   return (
-    <section className="relative rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-outline-variant/15 p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+    <section className="relative rounded-2xl bg-surface-container/50 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] overflow-hidden">
       <div className="absolute top-0 right-0 w-72 h-72 bg-tertiary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
@@ -65,7 +65,7 @@ const ScoreAnalysis = ({ payload }) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 relative z-10 mb-8 sm:mb-10">
-        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] hover:bg-surface-container-highest hover:border-tertiary/50 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(205,189,255,0.2)] transition-all duration-300 overflow-hidden cursor-default">
+        <div className="group relative rounded-xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20 p-4 sm:p-5 overflow-hidden cursor-default">
           <div className="absolute -top-10 -right-10 w-24 h-24 bg-tertiary/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="relative z-10">
             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-tertiary/80 transition-colors">Percentile Rank</p>
@@ -77,8 +77,8 @@ const ScoreAnalysis = ({ payload }) => {
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] hover:bg-surface-container-highest hover:border-[currentColor]/50 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-300 overflow-hidden cursor-default" style={{ color: delta >= 0 ? '#8E05C2' : '#ffb4ab' }}>
-          <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: delta >= 0 ? 'rgba(142,5,194,0.1)' : 'rgba(255,180,171,0.1)' }}></div>
+        <div className={`group relative rounded-xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20 p-4 sm:p-5 overflow-hidden cursor-default ${deltaTextClass}`}>
+          <div className={`absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none ${delta >= 0 ? 'bg-tertiary/10' : 'bg-error/10'}`}></div>
           <div className="relative z-10">
             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-current transition-colors">Peer Delta</p>
             <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-current">{delta >= 0 ? `+${delta}` : delta}</p>
@@ -86,7 +86,7 @@ const ScoreAnalysis = ({ payload }) => {
           </div>
         </div>
 
-        <div className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] hover:bg-surface-container-highest hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(142,5,194,0.18)] transition-all duration-300 overflow-hidden cursor-default">
+        <div className="group relative rounded-xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20 p-4 sm:p-5 overflow-hidden cursor-default">
           <div className="absolute -top-10 -right-10 w-24 h-24 bg-primary/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="relative z-10">
             <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 mb-2 group-hover:text-primary/80 transition-colors">Risk Regime</p>
@@ -105,21 +105,17 @@ const ScoreAnalysis = ({ payload }) => {
           {weakestFactors.map((factor) => {
             const accent = factor?.color || '#8E05C2';
             return (
-              <div key={factor.name} className="group relative rounded-xl bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] hover:border-outline-variant/50 hover:bg-surface-container-highest hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all duration-300 cursor-default overflow-hidden">
-                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ backgroundColor: `${accent}2A` }}></div>
+              <div key={factor.name} className="group relative rounded-xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20 p-4 sm:p-5 overflow-hidden cursor-default">
+                <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: `${accent}2A` }}></div>
                 
-                <div className="relative z-10 flex items-center justify-between mb-3 gap-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="flex shrink-0 items-center justify-center w-8 h-8 rounded-lg bg-surface-container border border-outline-variant/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] group-hover:scale-105 transition-transform duration-300" style={{ color: accent }}>
-                      <span className="material-symbols-outlined text-[16px]">{factor.icon}</span>
-                    </div>
-                    <h4 className="text-[13px] sm:text-sm font-bold text-on-surface/90 truncate">{factor.name}</h4>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-[14px]" style={{ color: accent }}>{factor.icon}</span>
+                    <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant/80 group-hover:text-on-surface transition-colors truncate">{factor.name}</p>
                   </div>
-                  <div className="shrink-0 px-2 py-0.5 rounded-md bg-surface-container/80 backdrop-blur-md border border-outline-variant/10" style={{ color: accent }}>
-                    <span className="text-[10px] sm:text-[11px] font-bold">{factor.score}</span>
-                  </div>
+                  <p className="text-3xl sm:text-4xl font-extrabold tracking-tight" style={{ color: accent }}>{factor.score}</p>
+                  <p className="text-[11px] sm:text-xs text-on-surface-variant mt-2 leading-relaxed">{suggestionForFactor(factor.name)}</p>
                 </div>
-                <p className="relative z-10 text-[11px] sm:text-xs text-on-surface-variant leading-relaxed">{suggestionForFactor(factor.name)}</p>
               </div>
             );
           })}

@@ -66,7 +66,7 @@ const CreditScoreSpeedometer = ({ score }) => {
       <div className="relative w-[20rem] h-[20rem] sm:w-[24rem] sm:h-[24rem] flex items-center justify-center group cursor-default transition-transform duration-700 hover:scale-105">
         
         {/* Ambient background external glow */}
-        <div className="absolute inset-0 rounded-full bg-primary/5 blur-[80px] group-hover:bg-primary/20 transition-colors duration-1000 pointer-events-none"></div>
+        <div className="absolute inset-0 rounded-full bg-primary/5 blur-[80px] group-hover:bg-primary/5 transition-colors duration-1000 pointer-events-none"></div>
 
         <svg 
           viewBox="0 0 300 300" 
@@ -138,8 +138,8 @@ const CreditScoreSpeedometer = ({ score }) => {
         </div>
 
         <div className="absolute flex flex-col items-center justify-center bg-surface-container-high/90 backdrop-blur-xl rounded-full w-56 h-56 sm:w-64 sm:h-64 border border-outline-variant/15 shadow-[inset_0_1px_rgba(255,255,255,0.06),0_0_20px_rgba(177,197,255,0.1)] z-20 overflow-hidden transition-all duration-700 group-hover:border-primary/40 group-hover:shadow-[inset_0_1px_rgba(255,255,255,0.15),0_0_50px_rgba(205,189,255,0.25)]">
-          <div className="absolute -top-12 -right-6 w-32 h-32 bg-tertiary/20 rounded-full blur-3xl opacity-80 group-hover:bg-tertiary/30 transition-colors duration-700"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-60 group-hover:bg-primary/30 transition-colors duration-700"></div>
+          <div className="absolute -top-12 -right-6 w-32 h-32 bg-tertiary/5 rounded-full blur-3xl opacity-80 group-hover:bg-tertiary/30 transition-colors duration-700"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl opacity-60 group-hover:bg-primary/30 transition-colors duration-700"></div>
           
           <div className="relative z-10 flex flex-col items-center mt-4">
             <div className="flex items-center gap-1.5 mb-2">

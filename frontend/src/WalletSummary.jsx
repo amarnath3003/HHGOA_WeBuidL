@@ -10,11 +10,11 @@ const WalletSummary = ({ summary, featuredCollections }) => {
       value: walletSummary.usdt_balance_display || 'N/A',
       subtitle: 'Tether USD',
       icon: 'currency_exchange',
-      colorBase: 'text-tertiary',
-      bgGlow: 'rgba(205,189,255,0.15)',
-      hexColor: '#cdbdff',
-      hoverBorder: 'hover:border-tertiary/50',
-      hoverShadow: 'hover:shadow-[0_8px_24px_rgba(205,189,255,0.2)]',
+      colorBase: 'text-primary',
+      bgGlow: 'rgba(177,197,255,0.15)',
+      hexColor: '#b1c5ff',
+      hoverBorder: 'hover:border-primary/50',
+      hoverShadow: 'hover:shadow-[0_8px_24px_rgba(177,197,255,0.2)]',
     },
     {
       title: 'ENS Identity',
@@ -43,11 +43,11 @@ const WalletSummary = ({ summary, featuredCollections }) => {
       value: typeof walletSummary.network_diversity === 'number' ? `${walletSummary.network_diversity} chains` : 'N/A',
       subtitle: `${walletSummary.nft_count ?? 0} NFTs tracked`,
       icon: 'lan',
-      colorBase: 'text-primary',
-      bgGlow: 'rgba(177,197,255,0.15)',
-      hexColor: '#b1c5ff',
-      hoverBorder: 'hover:border-primary/50',
-      hoverShadow: 'hover:shadow-[0_8px_24px_rgba(177,197,255,0.2)]',
+      colorBase: 'text-tertiary',
+      bgGlow: 'rgba(205,189,255,0.15)',
+      hexColor: '#cdbdff',
+      hoverBorder: 'hover:border-tertiary/50',
+      hoverShadow: 'hover:shadow-[0_8px_24px_rgba(205,189,255,0.2)]',
     },
   ];
 
@@ -66,7 +66,7 @@ const WalletSummary = ({ summary, featuredCollections }) => {
           {stats.map((stat) => (
             <article 
               key={stat.title} 
-              className={`group relative flex items-center justify-between p-4 rounded-xl bg-surface-container-low/50 backdrop-blur-xl border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-surface-container-highest cursor-default overflow-hidden ${stat.hoverBorder} ${stat.hoverShadow}`}
+              className={`group relative flex items-center justify-between p-4 rounded-xl bg-surface-container/50 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:border-white/20 cursor-default overflow-hidden ${stat.hoverBorder} ${stat.hoverShadow}`}
             >
               <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: stat.bgGlow }}></div>
               
@@ -113,17 +113,24 @@ const WalletSummary = ({ summary, featuredCollections }) => {
               return (
                 <article 
                   key={`${collection.chain}-${collection.name}`} 
-                  className={`group relative snap-start flex-shrink-0 w-44 rounded-xl border border-outline-variant/30 bg-surface-container-low/50 backdrop-blur-xl p-4 sm:p-5 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-surface-container-highest cursor-default overflow-hidden ${hoverBorder} ${hoverShadow}`}
+                  className={`group relative snap-start flex-shrink-0 w-48 rounded-xl border border-outline-variant/30 bg-surface-container/50 backdrop-blur-xl p-0 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 border border-white/10 self-start overflow-hidden hover:border-white/20 ${hoverBorder} ${hoverShadow}`}
                 >
                   <div className="absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: bgGlow }}></div>
                   
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className="flex items-center justify-between mb-3">
+                  {collection.imageUrl && (
+                    <div className="w-full h-32 bg-surface-container overflow-hidden relative">
+                      <img src={collection.imageUrl} alt={collection.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent"></div>
+                    </div>
+                  )}
+
+                  <div className="relative z-10 flex flex-col p-4">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="text-[9px] font-mono uppercase tracking-[0.25em] text-on-surface-variant/80 bg-surface-container border border-outline-variant/10 px-2 py-0.5 rounded-md">{collection.chain || 'unknown'}</div>
                       <span className="material-symbols-outlined text-[14px]" style={{ color: accentColor }}>{icon}</span>
                     </div>
                     <div className="text-[13px] sm:text-sm font-extrabold text-on-surface truncate group-hover:text-white transition-colors">{collection.name}</div>
-                    <div className="mt-1.5 text-[11px] sm:text-xs font-mono font-medium" style={{ color: accentColor }}>{collection.quantity ?? 1} items</div>
+                    <div className="mt-1 text-[11px] sm:text-xs font-mono font-medium" style={{ color: accentColor }}>{collection.quantity ?? 1} items</div>
                   </div>
                 </article>
               );
