@@ -95,15 +95,15 @@ function App() {
             {!address ? (
               <button
                 onClick={connectWallet}
-                className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 bg-tertiary-container text-tertiary-fixed text-sm sm:text-base font-semibold shadow-[0_8px_28px_rgba(98,42,228,0.45)] hover:shadow-[0_10px_34px_rgba(98,42,228,0.62)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-2"
+                className="rounded-full px-6 sm:px-8 py-3 sm:py-3.5 bg-tertiary-container text-tertiary-fixed text-sm sm:text-base font-semibold shadow-[0_8px_28px_rgba(98,42,228,0.45),inset_0_1px_rgba(255,255,255,0.2)] hover:shadow-[0_10px_34px_rgba(98,42,228,0.62),inset_0_1px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-2 border border-tertiary/30"
               >
                 <span className="material-symbols-outlined text-base sm:text-lg">shield</span>
                 Connect Wallet
               </button>
             ) : (
-              <div className="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full hover:bg-surface-container-highest hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 group cursor-pointer">
-                <span className="material-symbols-outlined text-xs text-tertiary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>account_balance_wallet</span>
-                <span className="font-mono text-xs tracking-tight text-on-surface-variant group-hover:text-on-surface transition-colors">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
+              <div className="flex items-center gap-2 bg-surface-container-high/60 backdrop-blur-md px-4 py-2 rounded-full border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.1)] hover:bg-surface-container-highest/80 hover:border-outline-variant/50 hover:shadow-[inset_0_1px_rgba(255,255,255,0.1),0_6px_16px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
+                <span className="material-symbols-outlined text-sm text-tertiary-fixed-dim drop-shadow-[0_0_8px_rgba(205,189,255,0.5)]" style={{fontVariationSettings: "'FILL' 1"}}>account_balance_wallet</span>
+                <span className="font-mono text-sm tracking-tight text-on-surface-variant group-hover:text-on-surface transition-colors font-medium">{`${address.slice(0, 6)}...${address.slice(-4)}`}</span>
               </div>
             )}
           </div>
@@ -114,9 +114,9 @@ function App() {
         <div className="mx-auto w-full max-w-7xl space-y-8">
           {!address && (
             <section className="flex justify-center opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-              <div className="flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-tertiary-container/20 rounded-full border border-tertiary/30 shadow-[0_0_22px_rgba(205,189,255,0.38)]">
-                <span className="material-symbols-outlined text-tertiary-fixed-dim text-base sm:text-lg" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
-                <span className="text-tertiary-fixed-dim text-sm sm:text-base uppercase tracking-[0.2em] font-mono">Nada AI Protected</span>
+              <div className="flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-tertiary/5 backdrop-blur-md rounded-full border border-tertiary/30 shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_32px_rgba(205,189,255,0.15)] group hover:bg-tertiary/10 hover:border-tertiary/50 transition-all duration-500">
+                <span className="material-symbols-outlined text-tertiary-fixed-dim text-base sm:text-lg drop-shadow-[0_0_8px_rgba(205,189,255,0.5)] group-hover:scale-110 transition-transform duration-300" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+                <span className="text-tertiary-fixed-dim text-sm sm:text-base uppercase tracking-[0.2em] font-mono font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-tertiary-fixed to-primary-fixed">Nada AI Protected</span>
               </div>
             </section>
           )}
@@ -143,8 +143,15 @@ function App() {
           )}
 
           {!address && (
-            <section className="mt-8 sm:mt-10 max-w-3xl mx-auto text-center text-on-surface-variant opacity-0 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-              <p className="text-lg sm:text-2xl leading-relaxed sm:leading-relaxed">Connect your wallet to initialize privacy-preserving score computation and unlock your on-chain credit intelligence dashboard.</p>
+            <section className="mt-12 sm:mt-16 max-w-4xl mx-auto text-center opacity-0 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
+              <div className="relative inline-block mb-6">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-tertiary opacity-20 blur-xl group-hover:opacity-40 transition duration-1000 animate-pulse"></div>
+                <h2 className="relative text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white via-on-surface-variant to-surface-variant drop-shadow-sm">
+                  Decentralized Credit. <br className="hidden sm:block" />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed to-tertiary-fixed">Zero Compromise.</span>
+                </h2>
+              </div>
+              <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-relaxed text-on-surface-variant font-medium">Connect your wallet to initialize privacy-preserving score computation and unlock your on-chain credit intelligence dashboard.</p>
             </section>
           )}
 
@@ -155,20 +162,23 @@ function App() {
               </div>
 
               <section className="grid grid-cols-2 gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
+                <div className="p-5 rounded-2xl bg-surface-container-high/40 backdrop-blur-xl border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] group hover:border-outline-variant/50 hover:bg-surface-container-highest/40 hover:shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-500 space-y-1">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Total Assets</span>
-                  <div className="text-lg font-bold text-on-surface">{walletData?.summary?.total_assets_display || '$0.00'}</div>
+                  <div className="text-xl sm:text-2xl font-black text-on-surface tracking-tight group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-surface-variant transition-all duration-300">{walletData?.summary?.total_assets_display || '$0.00'}</div>
                 </div>
-                <div className="p-5 rounded-xl bg-surface-container-high border border-white/5 space-y-1 hover:border-white/20 transition-colors duration-300">
+                <div className="p-5 rounded-2xl bg-surface-container-high/40 backdrop-blur-xl border border-outline-variant/30 shadow-[inset_0_1px_rgba(255,255,255,0.05),0_4px_12px_rgba(0,0,0,0.2)] group hover:border-outline-variant/50 hover:bg-surface-container-highest/40 hover:shadow-[inset_0_1px_rgba(255,255,255,0.1),0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-500 space-y-1">
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest block">Trust Score</span>
-                  <div className="text-lg font-bold text-tertiary-fixed-dim">{walletData?.trust_level || 'Pending'}</div>
+                  <div className="text-xl sm:text-2xl font-black text-tertiary-fixed-dim tracking-tight group-hover:shadow-glow transition-all duration-300">{walletData?.trust_level || 'Pending'}</div>
                 </div>
               </section>
 
               <section className="space-y-3 max-w-4xl opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-                <p className="text-[10px] font-mono uppercase tracking-[0.24em] text-on-surface-variant">Nada Risk Engine</p>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Deep Credit Diagnostics</h2>
-                <p className="text-sm text-on-surface-variant max-w-2xl">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 shadow-[inset_0_1px_rgba(255,255,255,0.1)] mb-2">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary">Nada Risk Engine</p>
+                </div>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-on-surface-variant drop-shadow-sm">Deep Credit Diagnostics</h2>
+                <p className="text-sm sm:text-base text-on-surface-variant max-w-2xl leading-relaxed">Your score intelligence prioritizes behavioral quality, consistency, and peer-relative resilience. Breakdown and peer analytics are now primary.</p>
               </section>
 
               <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
@@ -186,19 +196,19 @@ function App() {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-background/90 backdrop-blur-2xl rounded-t-3xl border-t border-primary/15 shadow-2xl">
-        <div className="max-w-7xl w-full mx-auto flex justify-around sm:justify-center sm:gap-16">
-          <button className="group flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/10 rounded-xl px-4 py-2 scale-110 duration-300 hover:shadow-glow hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Home</span>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center pb-safe pt-2 px-4 pb-4 bg-background/70 backdrop-blur-3xl rounded-t-[2.5rem] border-t border-outline-variant/30 shadow-[0_-8px_32px_rgba(0,0,0,0.4),inset_0_1px_rgba(255,255,255,0.05)] text-center w-full max-w-lg mx-auto sm:mb-6 sm:rounded-full sm:border">
+        <div className="w-full flex justify-around items-center gap-1 sm:gap-4 px-2">
+          <button className="group relative flex flex-col items-center justify-center text-tertiary-fixed-dim bg-tertiary/15 shadow-[inset_0_1px_rgba(255,255,255,0.2)] rounded-2xl sm:rounded-full px-5 py-2.5 sm:px-6 sm:py-3 transition-all duration-300 hover:shadow-[0_0_24px_rgba(205,189,255,0.4),inset_0_1px_rgba(255,255,255,0.3)] hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined text-xl sm:text-2xl transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(205,189,255,0.6)]" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest mt-1.5 font-bold">Home</span>
           </button>
-          <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-tertiary px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">history</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-tertiary transition-colors">History</span>
+          <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-primary-fixed-dim rounded-2xl sm:rounded-full px-5 py-2.5 sm:px-6 sm:py-3 transition-all duration-300 hover:bg-primary/5 hover:shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined text-xl sm:text-2xl transition-transform duration-300 group-hover:scale-110">history</span>
+            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest mt-1.5 font-semibold group-hover:font-bold transition-all">History</span>
           </button>
-          <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-tertiary px-4 py-2 transition-all duration-300 hover:-translate-y-1 active:scale-95">
-            <span className="material-symbols-outlined transition-transform duration-300 group-hover:scale-110">verified_user</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest mt-1 group-hover:text-tertiary transition-colors">Security</span>
+          <button className="group flex flex-col items-center justify-center text-on-surface-variant hover:text-tertiary-fixed-dim rounded-2xl sm:rounded-full px-5 py-2.5 sm:px-6 sm:py-3 transition-all duration-300 hover:bg-tertiary/5 hover:shadow-[inset_0_1px_rgba(255,255,255,0.05)] hover:-translate-y-1 active:scale-95">
+            <span className="material-symbols-outlined text-xl sm:text-2xl transition-transform duration-300 group-hover:scale-110">verified_user</span>
+            <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest mt-1.5 font-semibold group-hover:font-bold transition-all">Security</span>
           </button>
         </div>
       </nav>
