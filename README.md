@@ -3,12 +3,14 @@
 > **On-chain credit intelligence dashboard** for EVM wallets.  
 > FastAPI backend + React frontend + explainable score diagnostics.
 >
-> ![Alt text](frontend/src/nfts/White & Green Mobile Mockup Photo Collage Beauty Facebook Post.png)
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-20232A?logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
+
+ ![Alt text](frontend/src/nfts/White & Green Mobile Mockup Photo Collage Beauty Facebook Post.png)
+
 
 ## Why EtherScore
 
