@@ -3,7 +3,7 @@
 > **On-chain credit intelligence dashboard** for EVM wallets.  
 > FastAPI backend + React frontend + explainable score diagnostics.
 >
-> ![Alt text](images/example.png)
+> ![Alt text](frontend/src/nfts/White & Green Mobile Mockup Photo Collage Beauty Facebook Post.png)
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)
