@@ -14,7 +14,11 @@
 
 ## Why EtherScore
 
-Traditional credit rails miss users who are active on-chain. EtherScore transforms wallet behavior into a transparent credit-style score and a rich diagnostic view.
+# Problem:
+Traditional credit scoring systems rely on centralized data sources, which can be intrusive, biased, and vulnerable to data breaches. Many individuals, especially in the decentralized finance (DeFi) space, lack traditional credit histories, making it difficult to access financial services.
+
+# Solution:
+Our dApp provides a decentralized, privacy-preserving alternative to credit scoring by analyzing blockchain-based assets like USDT balances, NFT holdings, and ENS tokens. Users can leverage their digital assets for credit assessments without exposing personal financial information. This approach democratizes access to credit, eliminates bias, and enhances security by utilizing Nada AI’s blind computation for secure data processing.
 
 ## What’s Live Now
 
